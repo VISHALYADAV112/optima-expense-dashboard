@@ -116,6 +116,16 @@ input[type=search]:focus,select:focus{border-color:var(--profit);box-shadow:0 0 
 .merge-row .into{font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--ink)}
 .chip{display:inline-block;background:var(--soft);border:1px solid var(--line);
   border-radius:7px;padding:3px 9px;margin:2px 4px 2px 0;font-size:11.5px}
+.chip.self{background:#fff7ed;border-color:#fdba74;color:#9a3412;font-weight:650}
+.merge-row{padding:12px 6px;border-top:1px solid var(--line)}
+.merge-row .into{font-weight:700;font-size:13.5px;margin-bottom:6px}
+.tree{border-left:2px solid #dbe3f0;margin:6px 0 2px 8px;padding-left:12px}
+.sect{margin:16px 4px 8px;font-size:12px;font-weight:750;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sect::after{content:'';flex:1;height:1px;background:var(--line)}
+.badge-m{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:99px;
+  font-size:10.5px;font-weight:700;padding:2px 8px;margin-left:6px}
+.badge-m:hover{background:#dbeafe}
 .mut{color:var(--muted)}
 
 /* ---------- footer ---------- */
@@ -261,6 +271,7 @@ const fmtFull=n=>(n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN',{maximu
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const PALETTE=['#2563eb','#7c3aed','#db2777','#ea580c','#059669','#ca8a04','#0284c7','#dc2626','#16a34a','#9333ea','#0891b2','#d97706'];
 const T=DATA.totals;
+const MERGE_N={};DATA.mergeInfo.depts.forEach(r=>MERGE_N[r.into]=r.parts.length);
 
 function countUp(el,target,fmt){
   const t0=performance.now(),dur=900,from=0;
@@ -389,7 +400,9 @@ function renderCharts(){
     const p=d.sales-d.net;
     return `<div class="tile ${selDept===d.name?'sel':''}" onclick="setDept('${esc(d.name).replace(/'/g,"\'")}')"
       title="${esc(d.name)}: expenses ${fmtFull(d.net)}, sales ${fmtFull(d.sales)}">
-      <div class="nm"><span>${esc(d.name)}</span><span>${(Math.abs(d.net)/(S.exp||1)*100).toFixed(1)}%</span></div>
+      <div class="nm"><span>${esc(d.name)}${grouped&&MERGE_N[d.name]>1?
+        `<span class="badge-m" title="Combines ${MERGE_N[d.name]} SAP departments — click to see which"
+          onclick="event.stopPropagation();openMap('depts','${esc(d.name).replace(/'/g,"\'")}')">🧩${MERGE_N[d.name]}</span>`:''}</span><span>${(Math.abs(d.net)/(S.exp||1)*100).toFixed(1)}%</span></div>
       <div class="amt">${fmtINR(d.net)}</div>
       <div class="track"><i style="width:${(Math.abs(d.net)/maxExp*100).toFixed(1)}%"></i></div>
       <div class="pf">${p>=0?'▲':'▼'} profit ${fmtINR(p)}${d.budget!=null?' · budget '+fmtINR(d.budget):''}</div>
@@ -481,11 +494,25 @@ function renderMap(){
   const q=$('mapSearch').value.trim().toLowerCase();
   const M=DATA.mergeInfo;let html='';
   if(mapTab==='depts'){
-    for(const row of M.depts){
-      if(q&&!row.into.toLowerCase().includes(q)&&!row.parts.some(p=>p.toLowerCase().includes(q)))continue;
-      html+=`<div class="merge-row"><div class="into">📦 ${esc(row.into)}</div>`+
-        row.parts.map(p=>`<span class="chip">${esc(p)}</span>`).join('')+
-        `<span class="chip mut">${row.parts.length} in one</span></div>`;}
+    /* real merges: more than one department inside */
+    const merged=M.depts.filter(r=>r.parts.length>1).filter(r=>
+      !q||r.into.toLowerCase().includes(q)||r.parts.some(p=>p.toLowerCase().includes(q)));
+    /* kept as-is: single department, nothing combined */
+    const solo=M.depts.filter(r=>r.parts.length===1&&r.parts[0]!=='(Unassigned)').filter(r=>
+      !q||r.into.toLowerCase().includes(q));
+    html+=`<div class="sect">🔗 Combined — several departments shown as one (${merged.length})</div>`;
+    for(const row of merged){
+      const selfPart=row.parts.find(p=>p.toLowerCase()===row.into.toLowerCase());
+      const others=row.parts.filter(p=>p!==selfPart);
+      html+=`<div class="merge-row">
+        <div class="into">📦 <u>${esc(row.into)}</u> <span class="mut" style="font-weight:500;font-size:12px">is one bucket made of ${row.parts.length} SAP departments:</span></div>
+        <div class="tree">`+
+        others.map(p=>`<span class="chip">${esc(p)}</span>`).join('')+
+        (selfPart?`<span class="chip self">${esc(selfPart)} · same-named SAP department</span>`:'')+
+        `</div></div>`;
+    }
+    html+=`<div class="sect">📄 Not combined — these are single departments, exactly as in SAP (${solo.length})</div>`+
+      solo.map(r=>`<span class="chip" style="font-size:12px;padding:5px 11px">${esc(r.into)}</span>`).join('');
   }else{
     for(const row of M.heads){
       if(q&&!row.group.toLowerCase().includes(q)&&!row.accounts.some(a=>a.toLowerCase().includes(q)))continue;
@@ -495,7 +522,12 @@ function renderMap(){
   }
   $('mapBody').innerHTML=html||'<div style="padding:24px" class="mut">Nothing matches your search.</div>';
 }
-$('btnMap').onclick=()=>{$('mapOverlay').style.display='flex';renderMap();};
+window.openMap=function(tab,q){
+  mapTab=tab;$('mapSearch').value=q||'';
+  $('mtDepts').classList.toggle('on',tab==='depts');
+  $('mtHeads').classList.toggle('on',tab==='heads');
+  $('mapOverlay').style.display='flex';renderMap();};
+$('btnMap').onclick=()=>openMap('depts');
 $('mapClose').onclick=()=>$('mapOverlay').style.display='none';
 $('mapOverlay').onclick=e=>{if(e.target.id==='mapOverlay')e.target.style.display='none';};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('mapOverlay').style.display='none';});
