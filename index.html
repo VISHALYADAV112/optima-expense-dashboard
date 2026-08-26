@@ -3,145 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>P&L Dashboard — Turnover · Expenses · Profit | April – July FY 2026-27</title>
+<title>Money Story — Turnover · Expenses · Profit | April – July FY 2026-27</title>
 <style>
 :root{
-  --bg:#0f172a; --panel:#1e293b; --panel2:#243247; --line:#334155;
-  --txt:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8;
-  --good:#34d399; --bad:#f87171; --warn:#fbbf24;
+  --bg:#f4f6fb; --card:#ffffff; --line:#e5e9f2; --ink:#111827; --muted:#64748b;
+  --in:#059669; --out:#e11d48; --profit:#2563eb; --warn:#d97706;
+  --soft:#f8fafc; --chip:#eef2ff; --shadow:0 1px 3px rgba(16,24,40,.08),0 8px 24px -12px rgba(16,24,40,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--txt);font:14px/1.5 -apple-system,'Segoe UI',Roboto,Arial,sans-serif;padding:24px}
-.wrap{max-width:1400px;margin:0 auto}
-header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:20px}
-h1{font-size:22px;font-weight:700}
-h1 span{color:var(--accent)}
-.sub{color:var(--muted);font-size:13px;margin-top:4px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative;overflow:hidden}
-.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--kc,var(--accent))}
-.kpi .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
-.kpi .val{font-size:26px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
-.kpi .hint{color:var(--muted);font-size:11.5px;margin-top:4px}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
-.toggle{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.toggle button{background:transparent;color:var(--muted);border:none;border-radius:0;padding:8px 16px;font-weight:600;font-size:13px;cursor:pointer}
-.toggle button.on{background:var(--accent);color:#06263a}
-select,input[type=search]{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
-  border-radius:8px;padding:8px 12px;font-size:13px;outline:none}
-button.act{background:var(--accent);border:none;color:#06263a;font-weight:600;border-radius:8px;
-  padding:8px 16px;cursor:pointer;font-size:13px}
-.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-bottom:16px}
-@media(max-width:980px){.grid{grid-template-columns:1fr}}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
-.card h2{font-size:15px;font-weight:600;margin-bottom:2px}
-.card .note{color:var(--muted);font-size:12px;margin-bottom:10px}
-.chart-box{position:relative;height:430px}
-.chart-box.tall{height:520px}
-.badge{background:#0891b2;color:white;border-radius:999px;padding:2px 12px;font-size:12px;font-weight:600}
-.table-wrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:10px}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-thead th{position:sticky;top:0;background:var(--panel2);padding:9px 10px;text-align:right;
-  font-weight:600;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;z-index:2}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:28px 20px}
+.wrap{max-width:1280px;margin:0 auto;font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:18px}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#7c3aed);
+  display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:var(--shadow)}
+h1{font-size:21px;font-weight:800;letter-spacing:-.02em}
+h1 small{display:block;font-size:13px;color:var(--muted);font-weight:500;margin-top:1px}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;
+  padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:all .15s ease;min-height:40px}
+.btn:hover{border-color:#c7d0dd;box-shadow:var(--shadow)}
+.btn.primary{background:var(--profit);color:#fff;border-color:var(--profit)}
+.toggle{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px}
+.toggle button{background:transparent;border:none;border-radius:8px;padding:7px 14px;font-size:13px;
+  font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.toggle button.on{background:var(--ink);color:#fff}
+
+/* ---------- KPI hero cards ---------- */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px}
+@media(max-width:860px){.kpis{grid-template-columns:1fr}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 4px 6px rgba(16,24,40,.06),0 16px 32px -12px rgba(16,24,40,.18)}
+.kpi .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.kpi .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.kpi h3{font-size:13.5px;font-weight:600;color:var(--muted)}
+.kpi .val{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.kpi .sub{font-size:13px;color:var(--muted);margin-top:6px}
+.kpi .bar{height:6px;border-radius:99px;background:var(--soft);margin-top:14px;overflow:hidden}
+.kpi .bar i{display:block;height:100%;border-radius:99px;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.kpi.in .ic{background:#ecfdf5}.kpi.out .ic{background:#fff1f2}.kpi.net .ic{background:#eff6ff}
+.kpi.in .val{color:var(--in)}.kpi.out .val{color:var(--out)}.kpi.net .val{color:var(--profit)}
+.kpi.in .bar i{background:var(--in)}.kpi.out .bar i{background:var(--out)}.kpi.net .bar i{background:var(--profit)}
+
+/* ---------- story line ---------- */
+.story{background:linear-gradient(135deg,#eef4ff,#f5f3ff);border:1px solid #dbe5ff;border-radius:14px;
+  padding:14px 18px;margin-bottom:18px;font-size:14.5px;display:flex;gap:10px;align-items:flex-start}
+.story b{font-weight:700}
+
+/* ---------- chips ---------- */
+.chips{display:none;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.chip-f{background:var(--chip);border:1px solid #dbe2ff;color:#3730a3;border-radius:99px;
+  padding:6px 12px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.chip-f b{font-weight:700}
+.chip-f button{background:none;border:none;color:#3730a3;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.chips .clear{background:none;border:none;color:var(--out);font-weight:700;font-size:12.5px;cursor:pointer;text-decoration:underline}
+
+/* ---------- cards & sections ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+  margin-bottom:16px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;font-weight:750;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.takeaway{color:var(--muted);font-size:13px;margin:4px 0 14px}
+.grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.chart-box{position:relative;height:340px}
+.chart-box.tall{height:430px}
+
+/* ---------- dept tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--soft);
+  transition:all .15s ease;position:relative}
+.tile:hover{border-color:#b9c6ff;box-shadow:var(--shadow);transform:translateY(-1px)}
+.tile.sel{border-color:var(--profit);outline:2px solid var(--profit);background:#eff6ff}
+.tile .nm{font-weight:650;font-size:13px;margin-bottom:4px;display:flex;justify-content:space-between;gap:6px}
+.tile .nm span:last-child{color:var(--muted);font-weight:600;font-size:11.5px}
+.tile .amt{font-size:17px;font-weight:750;margin-bottom:7px}
+.tile .track{height:5px;background:#e9edf5;border-radius:99px;overflow:hidden}
+.tile .track i{display:block;height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);
+  border-radius:99px;width:0;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.tile .pf{font-size:11.5px;margin-top:7px;color:var(--muted)}
+
+/* ---------- table ---------- */
+.table-wrap{overflow:auto;max-height:440px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+thead th{position:sticky;top:0;background:var(--soft);padding:10px 12px;text-align:right;font-weight:650;
+  color:var(--muted);white-space:nowrap;z-index:2;border-bottom:1px solid var(--line);user-select:none}
 thead th:first-child,tbody td:first-child{text-align:left}
-tbody td{padding:7px 10px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-tbody tr:hover{background:var(--panel2)}
-tr.total td{font-weight:700;background:var(--panel2);border-top:2px solid var(--accent)}
-.pos{color:var(--txt)}.neg{color:var(--bad)}.dim{color:#475569}
-footer{color:var(--muted);font-size:11.5px;margin-top:22px;line-height:1.6}
-.pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);
-  border-radius:999px;padding:3px 12px;font-size:12px;color:var(--muted);margin-right:6px}
-#fInfo{color:var(--muted);font-size:12px}
-#mapOverlay{display:none;position:fixed;inset:0;background:rgba(2,6,23,.72);z-index:50;
-  align-items:center;justify-content:center;padding:24px}
-#mapModal{background:var(--panel);border:1px solid var(--line);border-radius:14px;
-  width:min(920px,96vw);max-height:88vh;padding:18px;display:flex;flex-direction:column}
-#mapHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+thead th[data-sort]{cursor:pointer}
+thead th[data-sort]:hover{color:var(--ink)}
+tbody td{padding:8px 12px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+tbody tr:hover td{background:#fafbff}
+tbody tr.rowclick{cursor:pointer}
+tr.total td{font-weight:750;background:var(--soft);border-top:2px solid var(--ink)}
+.dim{color:#cbd5e1}
+
+/* ---------- merge map modal ---------- */
+#mapOverlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+#mapModal{background:#fff;border-radius:18px;width:min(940px,96vw);max-height:88vh;
+  padding:20px 22px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(15,23,42,.25)}
+#mapHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 #mapSearch{margin-left:auto}
-#mapBody{overflow:auto;margin-top:4px}
-.merge-row{padding:10px 8px;border-top:1px solid var(--line)}
-.merge-row .into{font-weight:700;font-size:13.5px;color:var(--accent);margin-bottom:5px}
-.chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
-  border-radius:6px;padding:3px 9px;margin:2px 4px 2px 0;font-size:11.5px;color:var(--txt)}
+input[type=search],select{background:var(--soft);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:9px 13px;font-size:13px;outline:none;min-height:40px}
+select{cursor:pointer}
+input[type=search]:focus,select:focus{border-color:var(--profit);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+#mapBody{overflow:auto;margin-top:6px}
+.merge-row{padding:11px 6px;border-top:1px solid var(--line)}
+.merge-row .into{font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--ink)}
+.chip{display:inline-block;background:var(--soft);border:1px solid var(--line);
+  border-radius:7px;padding:3px 9px;margin:2px 4px 2px 0;font-size:11.5px}
+.mut{color:var(--muted)}
+
+/* ---------- footer ---------- */
+footer{color:var(--muted);font-size:11.5px;margin-top:20px;line-height:1.7}
+.hint-emoji{filter:saturate(.9)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <header>
-  <div>
-    <h1>📊 P&amp;L Dashboard <span>— Department wise</span></h1>
-    <div class="sub">Turnover · Net Expenses · Net Profit · Source: Distribution Report · April – July FY 2026-27</div>
-  </div>
-  <div><span class="pill">Expenses = G/L 5xxx</span><span class="pill">Turnover = G/L 4xxx</span></div>
-  <div style="width:100%;text-align:right;margin-top:-6px">
-    <button class="act" id="btnMap">🔗 View merge map — what got combined</button>
+  <div class="logo hint-emoji">💼</div>
+  <h1>Money Story — where it came from &amp; where it went
+    <small>Distribution Report (SAP) · April – July FY 2026-27 · amounts in ₹ (INR)</small>
+  </h1>
+  <div class="spacer"></div>
+  <button class="btn" id="btnMap">🧩 What got merged?</button>
+  <div class="toggle" title="Merged = her official grouping · Detailed = raw SAP values">
+    <button id="vGrouped" class="on">Merged</button>
+    <button id="vRaw">Detailed</button>
   </div>
 </header>
 
-<div id="mapOverlay">
-  <div id="mapModal">
-    <div id="mapHead">
-      <b>Merge map</b>
-      <span style="color:var(--muted);font-size:12px">which departments / G/L accounts are combined into each name</span>
-      <input type="search" id="mapSearch" placeholder="Search…">
-      <button class="act" id="mapClose" style="padding:4px 12px">✕</button>
-    </div>
-    <div class="toggle" style="margin:10px 0">
-      <button id="mtDepts" class="on">Departments (18 merged)</button>
-      <button id="mtHeads">Expense heads (47 groups)</button>
-    </div>
-    <div id="mapBody" class="table-wrap"></div>
+<!-- HERO KPIs -->
+<section class="kpis">
+  <div class="kpi in" onclick="jump('secDepts')" title="Click to see department-wise sales">
+    <div class="top"><div class="ic">💰</div><h3>Money earned (Turnover)</h3></div>
+    <div class="val" id="kIn">₹0</div>
+    <div class="sub">Sales booked from April to July — <span id="kInSub"></span></div>
+    <div class="bar"><i id="bIn"></i></div>
   </div>
-</div>
-
-<section class="kpis" id="kpis"></section>
-
-<div class="toolbar">
-  <div class="toggle">
-    <button id="vGrouped" class="on">Merged view</button>
-    <button id="vRaw">Detailed view</button>
+  <div class="kpi out" onclick="jump('secHeads')" title="Click to see what was spent on">
+    <div class="top"><div class="ic">🧾</div><h3>Money spent (Net Expenses)</h3></div>
+    <div class="val" id="kOut">₹0</div>
+    <div class="sub"><span id="kOutSub"></span> of every ₹100 earned went to expenses</div>
+    <div class="bar"><i id="bOut"></i></div>
   </div>
-  <label style="color:var(--muted)">Department:</label>
-  <select id="fDept"><option value="">All departments</option></select>
-  <input type="search" id="fSearch" placeholder="Search expense head…">
-  <button class="act" id="fReset">Reset filters</button>
-  <span id="fInfo"></span>
-</div>
-
-<section class="card">
-  <h2 id="plTitle">Profit &amp; Loss — by Department</h2>
-  <div class="note">Click a bar to drill down · Sales vs Expenses vs Profit per department</div>
-  <div class="chart-box tall"><canvas id="chPL"></canvas></div>
+  <div class="kpi net" onclick="jump('secFlow')" title="See the money bridge below">
+    <div class="top"><div class="ic">📈</div><h3>Profit kept (Net Profit)</h3></div>
+    <div class="val" id="kNet">₹0</div>
+    <div class="sub">Earnings − Expenses · margin <span id="kNetSub"></span></div>
+    <div class="bar"><i id="bNet"></i></div>
+  </div>
 </section>
 
-<div class="grid">
-  <section class="card">
-    <h2 id="mixTitle">Expense Heads — All Departments</h2>
-    <div class="note">Share of net spend by merged expense category</div>
-    <div class="chart-box"><canvas id="chMix"></canvas></div>
+<div class="story" id="storyBar">💡 <span id="storyText"></span></div>
+
+<!-- active filter chips -->
+<div class="chips" id="chips"></div>
+
+<!-- WATERFALL -->
+<section class="card" id="secFlow">
+  <h2>🌉 The money bridge</h2>
+  <div class="takeaway" id="tkFlow">One picture of the whole period: everything we earned, minus everything we spent, equals profit.</div>
+  <div class="chart-box tall"><canvas id="chFlow"></canvas></div>
+</section>
+
+<div class="grid2">
+  <!-- EXPENSE COMPOSITION -->
+  <section class="card" id="secHeads">
+    <h2>🧾 What was the money spent on?</h2>
+    <div class="takeaway" id="tkHeads">Top expense categories — click any bar to focus the whole page on it.</div>
+    <div class="chart-box"><canvas id="chHeads"></canvas></div>
   </section>
-  <section class="card">
-    <h2 id="drillTitle">Department Drill-down</h2>
-    <div class="note">Click a bar above or use the filter</div>
-    <div id="drillBody" class="table-wrap" style="max-height:430px"></div>
+
+  <!-- DEPARTMENT TILES -->
+  <section class="card" id="secDepts">
+    <h2>🏢 Which department spent how much?</h2>
+    <div class="takeaway" id="tkDepts">Size of bar = share of total expenses. Click a tile to open its full story.</div>
+    <div class="tiles" id="deptTiles"></div>
   </section>
 </div>
 
+<!-- DETAIL MATRIX -->
 <section class="card">
-  <h2>Department × Expense Head Matrix</h2>
-  <div class="note">Net amounts · click headers to sort · search filters rows</div>
+  <h2>🔍 Full detail — department × expense head</h2>
+  <div class="takeaway">The proof behind every number above. Click a row to select that department; click column names to sort.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <select id="fDept"><option value="">All departments</option></select>
+    <input type="search" id="fSearch" placeholder="Find an expense head… e.g. salary, travel, rent">
+    <button class="btn" id="fReset">✕ Clear all filters</button>
+    <span id="fInfo" class="mut" style="align-self:center;font-size:12.5px"></span>
+  </div>
   <div class="table-wrap"><table id="pivot"></table></div>
 </section>
 
 <footer>
-  Turnover = sales &amp; other operating income accounts (G/L series 4). Expenses = operating &amp; COGS accounts
-  (G/L series 5), shown net of credits/reversals. Assets/liabilities excluded.
-  Department and expense-head merging follows the mapping provided in “Attached_sheet.xlsx” (Sheet2 &amp; Sheet4);
-  switch to “Detailed view” for raw SAP values. Amounts in INR.
-  Generated from “Distribution Report April to July 26.xlsx”.
-  <span id="budgetNote"></span>
+  <b>How to read this:</b> “Turnover” is money earned from sales (G/L series 4). “Expenses” is money spent running the business
+  (G/L series 5, net of reversals). Assets, loans and taxes payable are not part of this story.
+  Department &amp; expense grouping follows the official mapping sheet — press <b>“What got merged?”</b> to see exactly which
+  items are combined inside each name, or switch to <b>Detailed</b> view for raw SAP values.
+  Budget comparison will appear automatically once the department-wise budget is shared.
 </footer>
+</div>
+
+<!-- MERGE MAP -->
+<div id="mapOverlay">
+  <div id="mapModal">
+    <div id="mapHead">
+      <b style="font-size:15px">🧩 Merge map</b>
+      <span class="mut" style="font-size:12.5px">which departments / accounts are combined inside each name</span>
+      <input type="search" id="mapSearch" placeholder="Search…">
+      <button class="btn" id="mapClose">✕ Close</button>
+    </div>
+    <div class="toggle" style="margin:6px 0 10px">
+      <button id="mtDepts" class="on">Departments</button>
+      <button id="mtHeads">Expense heads</button>
+    </div>
+    <div id="mapBody" class="table-wrap" style="border:none;max-height:60vh"></div>
+  </div>
 </div>
 
 <script>/**
@@ -167,121 +251,170 @@ footer{color:var(--muted);font-size:11.5px;margin-top:22px;line-height:1.6}
 </script>
 <script>const DATA={"period": "April – July FY 2026-27", "mergeInfo": {"depts": [{"into": "Accounts", "parts": ["Accounts"]}, {"into": "Admin", "parts": ["Administration"]}, {"into": "Corporate", "parts": ["Corporate", "Khor-C"]}, {"into": "Cure", "parts": ["Cure Medicines"]}, {"into": "Feedmade", "parts": ["Engineering", "Feedmate"]}, {"into": "GH", "parts": ["GH"]}, {"into": "HR", "parts": ["Human Resource"]}, {"into": "IT", "parts": ["IT"]}, {"into": "Lab", "parts": ["Lab"]}, {"into": "Legal", "parts": ["Legal"]}, {"into": "Logistics", "parts": ["Logistic"]}, {"into": "Maintenance", "parts": ["Maintenance"]}, {"into": "Marketing", "parts": ["Marketing", "Marketing West", "Sales Meet"]}, {"into": "NPD", "parts": ["Khor", "Khor - Rented Farm", "NPD"]}, {"into": "Production", "parts": ["Jejuri", "Production"]}, {"into": "Purchase", "parts": ["Purchase"]}, {"into": "Sales", "parts": ["Aqua", "Baramati Agro", "Export", "Ganga Foods", "Godrej Agrovet", "Kwality", "Lucid Impex", "MIROCHE INTERNATIONAL DMCC", "Nanda", "SKM", "SRS Japanese", "Sales", "Sales - Feedmate", "Shanthi", "Sneha"]}, {"into": "Store", "parts": ["Store"]}], "heads": [{"group": "(a) Salaries and incentives", "accounts": ["Overtime Charge", "Salary - Basic", "Salary - House rent allowance", "Salary - Leave Encashment paid", "Salary - Special allowance", "Salary- Awards", "Salary- Leave Travel Allowances", "Salary- Performance Bonus Paid", "Sodexo Meal Vouchers", "Traveling expenses- Domestic - director"]}, {"group": "(d) Mediclaim & Personal Accident Insurance", "accounts": ["Insurance charge-Others"]}, {"group": "(f) Stipend", "accounts": ["Salary- Stipend"]}, {"group": "(g) Staff welfare expenses", "accounts": ["Salary - Gift", "Staff Training Expenses", "Staff Welfare"]}, {"group": "(i) Provident fund & Admin Charges", "accounts": ["PF - Admin Charges", "PF PAID"]}, {"group": "Advertisement", "accounts": ["Advertisement"]}, {"group": "Bad Debts", "accounts": ["Bad Debts Written Off"]}, {"group": "Bank Charges", "accounts": ["Bank Charges Paid", "Credit Card Fees", "Forex Charges"]}, {"group": "Cost of goods sold", "accounts": ["Cost Of Goods Sold", "Custom Clearance Expenses", "Port to WH Transport Expenses", "Price Diffence between GRN/INV", "Purchase - Custom Duty", "Purchase - Labour", "Purchase of Consumable Material", "Purchase of Packing Materials", "Purchase of Trading Material", "Shipping Line Charges", "Variance Account (Production)", "transport"]}, {"group": "Domestic Sales", "accounts": ["Damages", "Discount allowed", "Rate Difference"]}, {"group": "Donation", "accounts": ["Courier Expense"]}, {"group": "Electricity Charges Office", "accounts": ["Guest House Electricity", "Office Electricity"]}, {"group": "Electricity Expenses, R & D, Production", "accounts": ["Electrical Charges"]}, {"group": "Exibition & conference", "accounts": ["Business Promotion - Others", "Business promotion- Exhibition & Events"]}, {"group": "Factory Expenses", "accounts": ["Factory Consumables", "Factory Misc Expenses", "Processing Charges - Mfg"]}, {"group": "Freight Inward", "accounts": ["Freight Inward", "Transport"]}, {"group": "Freight Outward", "accounts": ["ORC - Export Related Expeness", "Transporation Charges  - Carriage Outward"]}, {"group": "Fuel Charges", "accounts": ["Petrol expenses"]}, {"group": "Indirect Tax Dues", "accounts": ["Other Rates & Taxes"]}, {"group": "Insurance", "accounts": ["Insurance Charge- Stock", "Insurance charge-Director", "Insurance charge-Transport"]}, {"group": "Interest On cash Credit", "accounts": ["Interest paid on CC - DBS", "Interest paid on CC Account - ICICI", "Other Fees"]}, {"group": "Interest on GST, Vat", "accounts": ["Interest - Others"]}, {"group": "Interest on TDS", "accounts": ["INTEREST ON TDS"]}, {"group": "Interest On Unsecured Loan", "accounts": ["Interest Paid on Business Loan"]}, {"group": "Interest on Vehicle Loan", "accounts": ["Interest Paid on Vehicle Loan"]}, {"group": "Labour Charges & Wages", "accounts": ["Labour and Contractor Charges", "Security expenses"]}, {"group": "Legal Expenses", "accounts": ["Government Fees", "Legal Expenses"]}, {"group": "Loading & Unloading Charges", "accounts": ["Loading charges and Unloading charges", "Loading charges and Unloading charges - Plant"]}, {"group": "Lodging & boarding expenses", "accounts": ["Lodging and Boarding - Guest", "Lodging and Boarding-Staff", "Pantry Expenses"]}, {"group": "Marketing & Sales Promotion", "accounts": ["Bredol Applicator Expenses", "Product Development Costs", "Sales Meeting Expenses"]}, {"group": "Membership & Subscription", "accounts": ["Membership and Subscription", "Subscriptions, Books & Periodicals"]}, {"group": "Mobile & Internet Expenses", "accounts": ["Internet expense", "Telephone & Mobile expense"]}, {"group": "Net gain/loss on foreign currency transactions", "accounts": ["Foreign Exchange Losses"]}, {"group": "Office Expenses", "accounts": ["Office General Exp - Others", "Office General expense"]}, {"group": "Office Rent", "accounts": ["Guest House Rent", "Office rent"]}, {"group": "Other Expenses", "accounts": ["Gardening Expenses", "Housekeeping Expenses", "Medical Expenses", "Miscellaneous Office Supplies", "RoundOff", "Visa/ Empbassy Charges"]}, {"group": "Postage / Courier Charges", "accounts": ["Postage and Courier Service Charges"]}, {"group": "Printing & Stationery", "accounts": ["Printing and Stationery Expenses"]}, {"group": "Processing charges", "accounts": ["Processing charges for finance"]}, {"group": "Professional Fees", "accounts": ["Audit Fees - Statutory audit", "Professional Fees", "Professional fee - Export", "Quality Audit Expenses"]}, {"group": "Professional tax", "accounts": ["PROFESSIONAL TAX - Company"]}, {"group": "R & D & Lab Expenses", "accounts": ["Testing Charges"]}, {"group": "Repairs & Maintenance", "accounts": ["AMCs", "Repair and Maintainence - Vehicle", "Repair and Maintainence- Building", "Repair and Maintainence- Others", "Repair and Maintainence- Plant and Machinery", "Repairs and Maintainence - Computers"]}, {"group": "Snacks and lunch expenses", "accounts": ["Snacks and Lunch", "Snacks and Lunch - Others"]}, {"group": "Software Expenses", "accounts": ["IT Related Expenese", "Software Expenses"]}, {"group": "Stamp Duty charges", "accounts": ["STAMP Paper and Notary", "Stamp Duty Charges"]}, {"group": "Travelling & Conveyance Expenses", "accounts": ["Audit Fees - Others", "Auditor Expense/ Reimbursement", "Lodging and Boarding-Directors", "Toll naka charges", "Transport - Other", "Traveling expenses- Domestic - Staff", "Traveling expenses- International - Staff", "Traveling expenses- International - director", "Travelling", "Travelling - MMT"]}]}, "totals": {"turnover": 410928492.61, "expenses": 390941090.77, "profit": 19987401.84, "margin": 4.86, "hasBudget": false}, "salesBreakdown": [["Sales - Key", 210616260.33], ["Sales - Trade", 132192928.77], ["Sales - Export", 67794643.51], ["Other operating income", 208260.0], ["Sales - Aqua", 60000.0], ["Sales - Others", 56400.0]], "deptsGrouped": [{"name": "Sales", "net": 236209312.35, "sales": 405076897.61, "budget": null}, {"name": "Production", "net": 87549132.5, "sales": 0.0, "budget": null}, {"name": "Corporate", "net": 18231654.139999997, "sales": 5767465.0, "budget": null}, {"name": "HR", "net": 8767765.98, "sales": 0.0, "budget": null}, {"name": "Marketing", "net": 8678758.280000001, "sales": 0.0, "budget": null}, {"name": "NPD", "net": 6850640.27, "sales": 0.0, "budget": null}, {"name": "Purchase", "net": 5856769.9799999995, "sales": 0.0, "budget": null}, {"name": "Logistics", "net": 4582306.149999999, "sales": 0.0, "budget": null}, {"name": "Feedmade", "net": 3358527.8, "sales": 0.0, "budget": null}, {"name": "Admin", "net": 3150468.0999999996, "sales": 0.0, "budget": null}, {"name": "Accounts", "net": 2990399.2199999997, "sales": 0.0, "budget": null}, {"name": "Lab", "net": 1903215.7299999997, "sales": 84130.0, "budget": null}, {"name": "IT", "net": 911704.6599999999, "sales": 0.0, "budget": null}, {"name": "Cure", "net": 899383.16, "sales": 0.0, "budget": null}, {"name": "GH", "net": 454548.0, "sales": 0.0, "budget": null}, {"name": "Store", "net": 348961.6, "sales": 0.0, "budget": null}, {"name": "Maintenance", "net": 183385.0, "sales": 0.0, "budget": null}, {"name": "Legal", "net": 10000.0, "sales": 0.0, "budget": null}, {"name": "(Unassigned)", "net": 4157.85, "sales": 0.0, "budget": null}], "deptsRaw": [{"name": "Sales", "net": 201208781.19, "sales": 0.0, "budget": null}, {"name": "Production", "net": 54937751.17, "sales": 0.0, "budget": null}, {"name": "Jejuri", "net": 32611381.330000002, "sales": 0.0, "budget": null}, {"name": "Export", "net": 30788516.48, "sales": 0.0, "budget": null}, {"name": "Corporate", "net": 17380400.709999997, "sales": 0.0, "budget": null}, {"name": "Marketing", "net": 8839385.020000001, "sales": 0.0, "budget": null}, {"name": "Human Resource", "net": 8767765.98, "sales": 0.0, "budget": null}, {"name": "Purchase", "net": 5856769.9799999995, "sales": 0.0, "budget": null}, {"name": "Logistic", "net": 4582306.149999999, "sales": 0.0, "budget": null}, {"name": "NPD", "net": 4144141.1300000004, "sales": 0.0, "budget": null}, {"name": "Administration", "net": 3150468.0999999996, "sales": 0.0, "budget": null}, {"name": "Accounts", "net": 2990399.2199999997, "sales": 0.0, "budget": null}, {"name": "Engineering", "net": 2648429.8, "sales": 0.0, "budget": null}, {"name": "Khor", "net": 2628205.91, "sales": 0.0, "budget": null}, {"name": "SKM", "net": 2036602.82, "sales": 0.0, "budget": null}, {"name": "Lab", "net": 1903215.7299999997, "sales": 0.0, "budget": null}, {"name": "Shanthi", "net": 1061010.0, "sales": 0.0, "budget": null}, {"name": "IT", "net": 911704.6599999999, "sales": 0.0, "budget": null}, {"name": "Cure Medicines", "net": 899383.16, "sales": 0.0, "budget": null}, {"name": "Khor-C", "net": 851253.4299999999, "sales": 0.0, "budget": null}, {"name": "Feedmate", "net": 710098.0, "sales": 0.0, "budget": null}, {"name": "GH", "net": 454548.0, "sales": 0.0, "budget": null}, {"name": "Nanda", "net": 350912.68, "sales": 0.0, "budget": null}, {"name": "Store", "net": 348961.6, "sales": 0.0, "budget": null}, {"name": "MIROCHE INTERNATIONAL DMCC", "net": 285467.0, "sales": 0.0, "budget": null}, {"name": "Maintenance", "net": 183385.0, "sales": 0.0, "budget": null}, {"name": "Godrej Agrovet", "net": 137835.56, "sales": 0.0, "budget": null}, {"name": "Lucid Impex", "net": 90000.0, "sales": 0.0, "budget": null}, {"name": "Khor - Rented Farm", "net": 78293.23, "sales": 0.0, "budget": null}, {"name": "Sales - Feedmate", "net": 76570.0, "sales": 0.0, "budget": null}, {"name": "Baramati Agro", "net": 60062.0, "sales": 0.0, "budget": null}, {"name": "Kwality", "net": 59520.0, "sales": 0.0, "budget": null}, {"name": "Aqua", "net": 24594.62, "sales": 0.0, "budget": null}, {"name": "SRS Japanese", "net": 20000.0, "sales": 0.0, "budget": null}, {"name": "Legal", "net": 10000.0, "sales": 0.0, "budget": null}, {"name": "Ganga Foods", "net": 4720.0, "sales": 0.0, "budget": null}, {"name": "Sneha", "net": 4720.0, "sales": 0.0, "budget": null}, {"name": "(Unassigned)", "net": 4157.85, "sales": 0.0, "budget": null}, {"name": "Marketing West", "net": 2676.0, "sales": 0.0, "budget": null}, {"name": "Sales Meet", "net": -163302.74, "sales": 0.0, "budget": null}], "headsGrouped": [{"name": "Cost of goods sold", "net": 307524273.99}, {"name": "(a) Salaries and incentives", "net": 36946142.99}, {"name": "Freight Outward", "net": 7365116.180000001}, {"name": "(d) Mediclaim & Personal Accident Insurance", "net": 4757172.26}, {"name": "Professional Fees", "net": 3909415.2600000002}, {"name": "Labour Charges & Wages", "net": 3707037.1}, {"name": "Travelling & Conveyance Expenses", "net": 3602626.7300000004}, {"name": "Marketing & Sales Promotion", "net": 3192050.3099999996}, {"name": "Factory Expenses", "net": 2874559.47}, {"name": "Snacks and lunch expenses", "net": 1818445.23}, {"name": "Repairs & Maintenance", "net": 1488122.1}, {"name": "Software Expenses", "net": 1428722.88}, {"name": "Office Expenses", "net": 1317695.52}, {"name": "Freight Inward", "net": 1192211.28}, {"name": "Membership & Subscription", "net": 1142834.05}, {"name": "Loading & Unloading Charges", "net": 987376.64}, {"name": "Fuel Charges", "net": 918362.13}, {"name": "Electricity Expenses, R & D, Production", "net": 877230.0}, {"name": "Domestic Sales", "net": 785357.0}, {"name": "Office Rent", "net": 701509.0}, {"name": "Exibition & conference", "net": 681261.9800000001}, {"name": "Bank Charges", "net": 668350.7500000001}, {"name": "(g) Staff welfare expenses", "net": 651117.96}, {"name": "R & D & Lab Expenses", "net": 537458.0}, {"name": "Other Expenses", "net": 486691.37000000005}, {"name": "Printing & Stationery", "net": 475735.9}, {"name": "Lodging & boarding expenses", "net": 464429.54000000004}, {"name": "Mobile & Internet Expenses", "net": 313086.23}, {"name": "Insurance", "net": 312808.0}, {"name": "Advertisement", "net": 186284.0}, {"name": "Electricity Charges Office", "net": 134760.0}, {"name": "Postage / Courier Charges", "net": 130859.0}, {"name": "Legal Expenses", "net": 69780.0}, {"name": "Stamp Duty charges", "net": 66200.0}, {"name": "(f) Stipend", "net": 56500.0}, {"name": "Interest on GST, Vat", "net": 34298.04}, {"name": "Indirect Tax Dues", "net": 9247.0}, {"name": "Donation", "net": 9019.0}, {"name": "Professional tax", "net": 2500.0}, {"name": "Processing charges", "net": 1001.8}, {"name": "Net gain/loss on foreign currency transactions", "net": 915.08}, {"name": "Bad Debts", "net": 175.0}, {"name": "Interest on TDS", "net": 40.0}, {"name": "Interest On Unsecured Loan", "net": -7780.0}, {"name": "Interest on Vehicle Loan", "net": -8473.0}, {"name": "(i) Provident fund & Admin Charges", "net": -353515.0}, {"name": "Interest On cash Credit", "net": -517920.0}], "headsRaw": [{"name": "Cost Of Goods Sold", "net": 216486757.79}, {"name": "Purchase of Trading Material", "net": 69512867.49000001}, {"name": "Salary - Basic", "net": 18727834.27}, {"name": "Purchase of Packing Materials", "net": 9457382.13}, {"name": "Salary - House rent allowance", "net": 7447086.0}, {"name": "Transporation Charges  - Carriage Outward", "net": 6365315.77}, {"name": "Price Diffence between GRN/INV", "net": 6017648.290000001}, {"name": "Salary- Leave Travel Allowances", "net": 5056746.0}, {"name": "Insurance charge-Others", "net": 4757172.26}, {"name": "Purchase - Custom Duty", "net": 4087489.0}, {"name": "Professional Fees", "net": 3978765.4200000004}, {"name": "Labour and Contractor Charges", "net": 3471247.0}, {"name": "Salary - Special allowance", "net": 3378873.0}, {"name": "Sales Meeting Expenses", "net": 2693546.6599999997}, {"name": "Salary- Performance Bonus Paid", "net": 2052169.0}, {"name": "Traveling expenses- Domestic - Staff", "net": 1673990.5999999999}, {"name": "Factory Consumables", "net": 1470800.53}, {"name": "Software Expenses", "net": 1413376.88}, {"name": "Freight Inward", "net": 1191621.28}, {"name": "Travelling - MMT", "net": 1146603.6099999999}, {"name": "Membership and Subscription", "net": 1116531.0}, {"name": "Factory Misc Expenses", "net": 1056348.76}, {"name": "ORC - Export Related Expeness", "net": 999800.41}, {"name": "Loading charges and Unloading charges - Plant", "net": 933080.0}, {"name": "Office General Exp - Others", "net": 932580.0}, {"name": "Snacks and Lunch - Others", "net": 927679.0}, {"name": "Petrol expenses", "net": 918362.13}, {"name": "Snacks and Lunch", "net": 890766.23}, {"name": "Electrical Charges", "net": 877230.0}, {"name": "transport", "net": 866176.06}, {"name": "Rate Difference", "net": 673700.0}, {"name": "Bank Charges Paid", "net": 663824.8}, {"name": "Business promotion- Exhibition & Events", "net": 642498.3200000001}, {"name": "Staff Welfare", "net": 575087.96}, {"name": "Testing Charges", "net": 537458.0}, {"name": "Repair and Maintainence- Others", "net": 503754.69999999995}, {"name": "Printing and Stationery Expenses", "net": 475735.9}, {"name": "Professional fee - Export", "net": 452149.83999999997}, {"name": "Bredol Applicator Expenses", "net": 446308.4}, {"name": "Office rent", "net": 440400.0}, {"name": "Purchase of Consumable Material", "net": 405943.83}, {"name": "Lodging and Boarding-Staff", "net": 394088.54000000004}, {"name": "Office General expense", "net": 385115.52}, {"name": "Traveling expenses- International - director", "net": 369484.73}, {"name": "Processing Charges - Mfg", "net": 347410.18}, {"name": "Miscellaneous Office Supplies", "net": 345757.72}, {"name": "AMCs", "net": 291201.0}, {"name": "Repair and Maintainence- Plant and Machinery", "net": 288210.0}, {"name": "Guest House Rent", "net": 261109.0}, {"name": "Repair and Maintainence- Building", "net": 250266.0}, {"name": "Shipping Line Charges", "net": 236411.3}, {"name": "Security expenses", "net": 235790.1}, {"name": "Telephone & Mobile expense", "net": 226043.23}, {"name": "Port to WH Transport Expenses", "net": 223064.0}, {"name": "Custom Clearance Expenses", "net": 211409.1}, {"name": "Advertisement", "net": 186284.0}, {"name": "Insurance charge-Director", "net": 151387.0}, {"name": "Traveling expenses- International - Staff", "net": 142403.35}, {"name": "Insurance Charge- Stock", "net": 141416.0}, {"name": "Postage and Courier Service Charges", "net": 130859.0}, {"name": "Office Electricity", "net": 115610.0}, {"name": "Lodging and Boarding-Directors", "net": 111075.74}, {"name": "Discount allowed", "net": 108022.0}, {"name": "Salary - Leave Encashment paid", "net": 107661.0}, {"name": "Repair and Maintainence - Vehicle", "net": 104753.0}, {"name": "Housekeeping Expenses", "net": 91585.2}, {"name": "Internet expense", "net": 87043.0}, {"name": "Overtime Charge", "net": 80066.62}, {"name": "Pantry Expenses", "net": 65406.0}, {"name": "Traveling expenses- Domestic - director", "net": 64869.6}, {"name": "Salary- Stipend", "net": 56500.0}, {"name": "Staff Training Expenses", "net": 55530.0}, {"name": "Loading charges and Unloading charges", "net": 54296.64}, {"name": "Stamp Duty Charges", "net": 54000.0}, {"name": "Toll naka charges", "net": 52336.0}, {"name": "Product Development Costs", "net": 52195.25}, {"name": "Repairs and Maintainence - Computers", "net": 49937.4}, {"name": "Government Fees", "net": 42580.0}, {"name": "Business Promotion - Others", "net": 38763.66}, {"name": "Transport - Other", "net": 36783.0}, {"name": "Interest - Others", "net": 34298.04}, {"name": "Travelling", "net": 33501.0}, {"name": "Audit Fees - Others", "net": 30000.0}, {"name": "Legal Expenses", "net": 27200.0}, {"name": "Subscriptions, Books & Periodicals", "net": 26303.05}, {"name": "Visa/ Empbassy Charges", "net": 25167.0}, {"name": "Sodexo Meal Vouchers", "net": 22837.5}, {"name": "Salary - Gift", "net": 20500.0}, {"name": "Insurance charge-Transport", "net": 20005.0}, {"name": "Gardening Expenses", "net": 19455.0}, {"name": "Guest House Electricity", "net": 19150.0}, {"name": "Quality Audit Expenses", "net": 18500.0}, {"name": "IT Related Expenese", "net": 15346.0}, {"name": "STAMP Paper and Notary", "net": 12200.0}, {"name": "Purchase - Labour", "net": 11750.0}, {"name": "Other Rates & Taxes", "net": 9247.0}, {"name": "Courier Expense", "net": 9019.0}, {"name": "Salary- Awards", "net": 8000.0}, {"name": "Variance Account (Production)", "net": 7375.0}, {"name": "Auditor Expense/ Reimbursement", "net": 6448.7}, {"name": "Lodging and Boarding - Guest", "net": 4935.0}, {"name": "Medical Expenses", "net": 4726.0}, {"name": "Damages", "net": 3635.0}, {"name": "Forex Charges", "net": 3502.0}, {"name": "PROFESSIONAL TAX - Company", "net": 2500.0}, {"name": "Credit Card Fees", "net": 1023.95}, {"name": "Processing charges for finance", "net": 1001.8}, {"name": "Other Fees", "net": 1000.0}, {"name": "Foreign Exchange Losses", "net": 915.08}, {"name": "Transport", "net": 590.0}, {"name": "Bad Debts Written Off", "net": 175.0}, {"name": "INTEREST ON TDS", "net": 40.0}, {"name": "RoundOff", "net": 0.44999999999999996}, {"name": "Interest Paid on Business Loan", "net": -7780.0}, {"name": "Interest Paid on Vehicle Loan", "net": -8473.0}, {"name": "PF - Admin Charges", "net": -13914.0}, {"name": "Interest paid on CC - DBS", "net": -29860.0}, {"name": "PF PAID", "net": -339601.0}, {"name": "Interest paid on CC Account - ICICI", "net": -489060.0}, {"name": "Audit Fees - Statutory audit", "net": -540000.0}], "matrixGrouped": {"(Unassigned)": {"Travelling & Conveyance Expenses": 3770.85, "Bank Charges": 387.0}, "Admin": {"Travelling & Conveyance Expenses": 39803.0, "(a) Salaries and incentives": 669939.27, "Lodging & boarding expenses": 25147.0, "Exibition & conference": 14988.0, "Bank Charges": 80.09, "Stamp Duty charges": 800.0, "Office Rent": 335400.0, "Professional Fees": 20000.0, "Repairs & Maintenance": 88341.1, "Labour Charges & Wages": 714693.1, "Printing & Stationery": 72271.72, "Postage / Courier Charges": 130859.0, "Other Expenses": 154871.91, "Office Expenses": 95925.4, "Electricity Charges Office": 115610.0, "(g) Staff welfare expenses": 182556.0, "Donation": 2100.0, "Cost of goods sold": 37179.89, "Factory Expenses": 89182.86, "Fuel Charges": 346532.76, "Snacks and lunch expenses": 14187.0}, "Sales": {"Cost of goods sold": 211817819.08, "Marketing & Sales Promotion": 119888.0, "R & D & Lab Expenses": 76050.0, "Loading & Unloading Charges": 931152.0, "Freight Outward": 4188045.86, "Bank Charges": 20754.28, "Interest On cash Credit": 1000.0, "Stamp Duty charges": 1100.0, "Professional Fees": 1991980.0, "(d) Mediclaim & Personal Accident Insurance": 109121.0, "Repairs & Maintenance": 200.0, "Snacks and lunch expenses": 1495530.23, "Factory Expenses": 114180.5, "Travelling & Conveyance Expenses": 2291946.82, "Domestic Sales": 785357.0, "Exibition & conference": 225490.15, "(a) Salaries and incentives": 10508945.6, "Lodging & boarding expenses": 266354.54, "Insurance": 20005.0, "Mobile & Internet Expenses": 14468.0, "Printing & Stationery": 420.0, "Other Expenses": 160.21, "Office Expenses": 1037580.0, "(g) Staff welfare expenses": 13496.0, "Net gain/loss on foreign currency transactions": 915.08, "Donation": 1970.0, "Software Expenses": 175383.0}, "Corporate": {"(a) Salaries and incentives": 7626102.0, "Travelling & Conveyance Expenses": 11960.0, "Lodging & boarding expenses": 7500.0, "Exibition & conference": 188090.01, "Marketing & Sales Promotion": 2592333.4, "Bank Charges": 8486.65, "Professional tax": 2500.0, "Professional Fees": 600000.0, "Insurance": 151387.0, "(d) Mediclaim & Personal Accident Insurance": 240203.48, "Mobile & Internet Expenses": 15707.0, "Repairs & Maintenance": 322295.0, "Other Expenses": 251399.01, "Office Expenses": 68855.12, "Membership & Subscription": 1083611.0, "(g) Staff welfare expenses": 43724.0, "Bad Debts": 175.0, "Cost of goods sold": 4629000.0, "Factory Expenses": 262167.13, "Fuel Charges": 100240.38, "Snacks and lunch expenses": 13532.0, "Legal Expenses": 10000.0, "Loading & Unloading Charges": 1590.64, "Freight Outward": 795.32}, "Cure": {"Cost of goods sold": 734943.16, "Travelling & Conveyance Expenses": 9135.0, "Exibition & conference": 12000.0, "Professional Fees": 125000.0, "Repairs & Maintenance": 13600.0, "Printing & Stationery": 2655.0, "Software Expenses": 1450.0, "Legal Expenses": 600.0}, "Feedmade": {"(a) Salaries and incentives": 1862893.0, "Travelling & Conveyance Expenses": 725852.4, "Lodging & boarding expenses": 77373.0, "Exibition & conference": 28703.0, "Repairs & Maintenance": 74576.0, "Printing & Stationery": 40.0, "Donation": 4489.0, "Marketing & Sales Promotion": 326420.4, "Snacks and lunch expenses": 132154.0, "(g) Staff welfare expenses": 2000.0, "Software Expenses": 1500.0, "Other Expenses": 22527.0, "Professional Fees": 100000.0}, "Accounts": {"(a) Salaries and incentives": 2667083.0, "Travelling & Conveyance Expenses": 44351.1, "Bank Charges": 632450.31, "Interest on TDS": 40.0, "Stamp Duty charges": 60900.0, "Professional Fees": -377810.0, "(d) Mediclaim & Personal Accident Insurance": -180838.0, "Membership & Subscription": 21000.0, "Printing & Stationery": 11146.0, "Other Expenses": 800.0, "(g) Staff welfare expenses": 3345.0, "Donation": 80.0, "Factory Expenses": 1243.01, "Repairs & Maintenance": 1770.0, "Interest On Unsecured Loan": -7780.0, "Interest on Vehicle Loan": -8473.0, "Interest On cash Credit": -518920.0, "Processing charges": 1001.8, "Software Expenses": 588230.0, "Snacks and lunch expenses": 1550.0, "Legal Expenses": 49180.0, "Lodging & boarding expenses": 50.0}, "GH": {"Exibition & conference": 8250.0, "Office Rent": 261109.0, "Mobile & Internet Expenses": 1803.0, "Repairs & Maintenance": 65280.0, "Other Expenses": 3185.0, "Office Expenses": 4135.0, "(g) Staff welfare expenses": 280.0, "Fuel Charges": 500.0, "Snacks and lunch expenses": 57922.0, "Electricity Charges Office": 19150.0, "Lodging & boarding expenses": 32934.0}, "HR": {"(a) Salaries and incentives": 1137178.5, "Travelling & Conveyance Expenses": 193698.7, "Exibition & conference": 1383.0, "Marketing & Sales Promotion": 65190.0, "(i) Provident fund & Admin Charges": -353515.0, "Office Rent": 105000.0, "Professional Fees": 760000.0, "(d) Mediclaim & Personal Accident Insurance": 4589988.78, "Printing & Stationery": 649.0, "Membership & Subscription": 12000.0, "(g) Staff welfare expenses": 285808.0, "Labour Charges & Wages": 1924885.0, "Software Expenses": 45500.0}, "IT": {"(a) Salaries and incentives": 14053.0, "Travelling & Conveyance Expenses": 1139.0, "Mobile & Internet Expenses": 250659.23, "Repairs & Maintenance": 58425.0, "Printing & Stationery": 2500.0, "Other Expenses": 1003.0, "Factory Expenses": 5829.69, "Labour Charges & Wages": 122760.0, "Software Expenses": 455335.74}, "Production": {"Cost of goods sold": 81779942.86, "Electricity Expenses, R & D, Production": 867140.0, "Travelling & Conveyance Expenses": 28262.0, "Stamp Duty charges": 1000.0, "Repairs & Maintenance": 462372.0, "Printing & Stationery": 239078.32, "Membership & Subscription": 10000.0, "Other Expenses": 18178.0, "(g) Staff welfare expenses": 25560.0, "Freight Inward": 8783.0, "Factory Expenses": 1085551.58, "Snacks and lunch expenses": 5360.0, "(a) Salaries and incentives": 2206849.62, "Loading & Unloading Charges": 1652.0, "Freight Outward": 5835.0, "Bank Charges": 3736.12, "Insurance": 141416.0, "Labour Charges & Wages": 658416.0}, "NPD": {"Cost of goods sold": 2586527.79, "Marketing & Sales Promotion": 52195.25, "Factory Expenses": 1118252.63, "Electricity Expenses, R & D, Production": 10090.0, "Travelling & Conveyance Expenses": 42605.0, "Lodging & boarding expenses": 15930.0, "Loading & Unloading Charges": 7500.0, "Exibition & conference": 573.0, "Indirect Tax Dues": 9247.0, "Mobile & Internet Expenses": 30000.0, "Repairs & Maintenance": 199043.6, "Printing & Stationery": 4301.0, "Other Expenses": 6177.0, "Office Expenses": 41200.0, "(g) Staff welfare expenses": 8094.0, "Freight Inward": 3160.0, "Labour Charges & Wages": 25500.0, "Fuel Charges": 11970.0, "Software Expenses": 135936.0, "Snacks and lunch expenses": 35996.0, "R & D & Lab Expenses": 359448.0, "(a) Salaries and incentives": 1882921.0, "Freight Outward": 6973.0, "Professional Fees": 257000.0}, "Lab": {"Cost of goods sold": 361099.13, "R & D & Lab Expenses": 36960.0, "(a) Salaries and incentives": 1240733.0, "(f) Stipend": 56500.0, "Travelling & Conveyance Expenses": 42023.4, "Lodging & boarding expenses": 2520.0, "Stamp Duty charges": 500.0, "Repairs & Maintenance": 20662.4, "Printing & Stationery": 790.6, "Other Expenses": 22500.0, "(g) Staff welfare expenses": 4510.0, "Donation": 380.0, "Factory Expenses": 84284.2, "Professional Fees": 18500.0, "Snacks and lunch expenses": 11253.0}, "Legal": {"Legal Expenses": 10000.0}, "Logistics": {"(a) Salaries and incentives": 612720.0, "Lodging & boarding expenses": 1500.0, "Travelling & Conveyance Expenses": 22583.0, "Loading & Unloading Charges": 27790.0, "Freight Outward": 3114381.0, "Bank Charges": 2.36, "(d) Mediclaim & Personal Accident Insurance": -1303.0, "Repairs & Maintenance": 71583.0, "Freight Inward": -13894.0, "Factory Expenses": 14820.8, "Labour Charges & Wages": 260783.0, "Fuel Charges": 459118.99, "Snacks and lunch expenses": 11721.0, "(g) Staff welfare expenses": 500.0}, "Maintenance": {"Freight Outward": 47200.0, "Repairs & Maintenance": 98489.0, "Factory Expenses": 37696.0}, "Marketing": {"Cost of goods sold": 2318626.68, "R & D & Lab Expenses": 60000.0, "Travelling & Conveyance Expenses": 112064.46, "(a) Salaries and incentives": 5204792.0, "Lodging & boarding expenses": 35121.0, "Advertisement": 186284.0, "Exibition & conference": 201784.82, "Bank Charges": 1210.18, "Professional Fees": 200000.0, "Mobile & Internet Expenses": 449.0, "Membership & Subscription": 14423.05, "Printing & Stationery": 137638.66, "Other Expenses": 5890.0, "(g) Staff welfare expenses": 79744.96, "Factory Expenses": 33156.07, "Repairs & Maintenance": 1500.0, "Software Expenses": 25388.14, "Snacks and lunch expenses": 24662.0, "Marketing & Sales Promotion": 36023.26}, "Purchase": {"Cost of goods sold": 3259135.4, "R & D & Lab Expenses": 5000.0, "(a) Salaries and incentives": 990232.0, "Travelling & Conveyance Expenses": 33432.0, "Loading & Unloading Charges": 17692.0, "Freight Outward": 1886.0, "Bank Charges": 1243.76, "Stamp Duty charges": 1900.0, "Professional Fees": 214745.26, "Membership & Subscription": 1800.0, "Printing & Stationery": 930.0, "Office Expenses": 70000.0, "Freight Inward": 1194162.28, "Factory Expenses": 5000.0, "Other Expenses": 0.24, "Repairs & Maintenance": 9735.0, "Snacks and lunch expenses": 14578.0, "(g) Staff welfare expenses": 1000.0, "Interest on GST, Vat": 34298.04}, "Store": {"(a) Salaries and incentives": 321701.0, "Repairs & Maintenance": 250.0, "Printing & Stationery": 3315.6, "Factory Expenses": 23195.0, "(g) Staff welfare expenses": 500.0}}, "matrixRaw": {"(Unassigned)": {"Traveling expenses- Domestic - Staff": 3770.85, "Forex Charges": 387.0}, "Administration": {"Travelling": 419.0, "Salary - Basic": 356209.27, "Salary - House rent allowance": 141641.0, "Salary - Special allowance": 71186.0, "Salary - Leave Encashment paid": 15638.0, "Salary- Leave Travel Allowances": 85045.0, "Traveling expenses- Domestic - director": 220.0, "Traveling expenses- Domestic - Staff": 24887.0, "Traveling expenses- International - Staff": 7754.0, "Lodging and Boarding-Staff": 1200.0, "Business promotion- Exhibition & Events": 14988.0, "Bank Charges Paid": 80.09, "STAMP Paper and Notary": 800.0, "Office rent": 335400.0, "Professional Fees": 20000.0, "Repair and Maintainence- Building": 28650.0, "Repair and Maintainence- Others": 34683.1, "Security expenses": 235790.1, "Printing and Stationery Expenses": 72271.72, "Postage and Courier Service Charges": 130859.0, "Miscellaneous Office Supplies": 62288.71, "Office General expense": 95925.4, "Housekeeping Expenses": 73072.2, "Office Electricity": 115610.0, "Staff Welfare": 172706.0, "Courier Expense": 2100.0, "Cost Of Goods Sold": 37179.89, "Factory Misc Expenses": 65832.86, "Labour and Contractor Charges": 478903.0, "Repairs and Maintainence - Computers": 2916.0, "Petrol expenses": 346532.76, "Repair and Maintainence - Vehicle": 22092.0, "Staff Training Expenses": 8850.0, "Snacks and Lunch": 14187.0, "Factory Consumables": 23350.0, "Travelling - MMT": 5957.0, "Salary - Gift": 1000.0, "Transport - Other": 786.0, "Medical Expenses": 4306.0, "Pantry Expenses": 23947.0, "Gardening Expenses": 15205.0}, "Aqua": {"Cost Of Goods Sold": 24594.62}, "Baramati Agro": {"Bredol Applicator Expenses": 60062.0}, "Corporate": {"Salary - Basic": 4004776.0, "Salary - House rent allowance": 1601913.0, "Salary - Special allowance": 833215.0, "Salary- Leave Travel Allowances": 1186198.0, "Traveling expenses- Domestic - Staff": 1315.0, "Lodging and Boarding-Staff": 7500.0, "Toll naka charges": 10645.0, "Business promotion- Exhibition & Events": 167840.01, "Sales Meeting Expenses": 2592333.4, "Bank Charges Paid": 6311.7, "PROFESSIONAL TAX - Company": 2500.0, "Professional Fees": 600000.0, "Insurance charge-Director": 151387.0, "Insurance charge-Others": 240203.48, "Telephone & Mobile expense": 15707.0, "Repair and Maintainence- Others": 6100.0, "Miscellaneous Office Supplies": 16899.01, "Office General expense": 8756.78, "Membership and Subscription": 1083611.0, "Staff Welfare": 43724.0, "Bad Debts Written Off": 175.0, "Cost Of Goods Sold": 4629000.0, "Factory Misc Expenses": 14800.0, "Petrol expenses": 100240.38, "Repair and Maintainence - Vehicle": 9293.0, "Snacks and Lunch": 13532.0, "Government Fees": 10000.0, "Forex Charges": 1151.0, "Business Promotion - Others": 20250.0, "Credit Card Fees": 1023.95}, "Cure Medicines": {"transport": 732030.66, "Purchase of Trading Material": 2912.5, "Traveling expenses- Domestic - Staff": 6695.0, "Business promotion- Exhibition & Events": 12000.0, "Professional Fees": 125000.0, "AMCs": 13600.0, "Printing and Stationery Expenses": 2655.0, "Software Expenses": 1450.0, "Government Fees": 600.0, "Transport - Other": 2440.0}, "Engineering": {"Salary - Basic": 825652.0, "Salary - House rent allowance": 330269.0, "Salary - Special allowance": 135877.0, "Salary- Leave Travel Allowances": 220137.0, "Salary- Awards": 2000.0, "Salary- Performance Bonus Paid": 348958.0, "Traveling expenses- Domestic - Staff": 265502.0, "Lodging and Boarding-Staff": 33203.0, "Business promotion- Exhibition & Events": 21643.0, "AMCs": 69620.0, "Printing and Stationery Expenses": 40.0, "Courier Expense": 1630.0, "Repairs and Maintainence - Computers": 4956.0, "Bredol Applicator Expenses": 218788.4, "Snacks and Lunch": 49494.0, "Travelling - MMT": 93323.4, "Salary - Gift": 2000.0, "IT Related Expenese": 1500.0, "Visa/ Empbassy Charges": 21167.0, "Transport - Other": 2250.0, "Medical Expenses": 420.0}, "Export": {"Testing Charges": 76050.0, "Loading charges and Unloading charges": 700.0, "Transporation Charges  - Carriage Outward": 728024.0, "Bank Charges Paid": 19460.28, "Other Fees": 1000.0, "STAMP Paper and Notary": 800.0, "Professional fee - Export": 166682.84, "Insurance charge-Others": 109121.0, "Repair and Maintainence- Others": 200.0, "Cost Of Goods Sold": 28592394.45, "Snacks and Lunch": 1840.0, "Factory Consumables": 91930.5, "ORC - Export Related Expeness": 999800.41, "Transport - Other": 513.0}, "Feedmate": {"Travelling": 6968.0, "Traveling expenses- Domestic - Staff": 205737.0, "Lodging and Boarding-Staff": 44170.0, "Business promotion- Exhibition & Events": 7060.0, "Professional Fees": 100000.0, "Miscellaneous Office Supplies": 940.0, "Courier Expense": 2859.0, "Bredol Applicator Expenses": 107632.0, "Snacks and Lunch": 82660.0, "Travelling - MMT": 149629.0, "Transport - Other": 2443.0}, "Accounts": {"Salary - Basic": 1287766.0, "Salary - House rent allowance": 515113.0, "Salary - Special allowance": 207133.0, "Salary- Leave Travel Allowances": 349819.0, "Salary- Performance Bonus Paid": 307252.0, "Traveling expenses- Domestic - Staff": 13269.1, "Bank Charges Paid": 632450.31, "INTEREST ON TDS": 40.0, "STAMP Paper and Notary": 6900.0, "Professional Fees": 162190.0, "Insurance charge-Others": -180838.0, "Subscriptions, Books & Periodicals": 21000.0, "Printing and Stationery Expenses": 11146.0, "Miscellaneous Office Supplies": 800.0, "Audit Fees - Statutory audit": -540000.0, "Audit Fees - Others": 30000.0, "Staff Welfare": 665.0, "Courier Expense": 80.0, "Stamp Duty Charges": 54000.0, "Factory Misc Expenses": 1243.01, "Repairs and Maintainence - Computers": 1770.0, "Interest Paid on Business Loan": -7780.0, "Interest Paid on Vehicle Loan": -8473.0, "Interest paid on CC Account - ICICI": -489060.0, "Staff Training Expenses": 1180.0, "Processing charges for finance": 1001.8, "Software Expenses": 588230.0, "Snacks and Lunch": 1550.0, "Government Fees": 31980.0, "Legal Expenses": 17200.0, "Salary - Gift": 1500.0, "Transport - Other": 1082.0, "Pantry Expenses": 50.0, "Interest paid on CC - DBS": -29860.0}, "Ganga Foods": {"Bredol Applicator Expenses": 4720.0}, "GH": {"Business promotion- Exhibition & Events": 8250.0, "Guest House Rent": 261109.0, "Telephone & Mobile expense": 1803.0, "Repair and Maintainence- Building": 4634.0, "Repair and Maintainence- Others": 60646.0, "Miscellaneous Office Supplies": 1280.0, "Office General expense": 4135.0, "Housekeeping Expenses": 1905.0, "Staff Welfare": 280.0, "Petrol expenses": 500.0, "Snacks and Lunch": 57922.0, "Guest House Electricity": 19150.0, "Pantry Expenses": 32934.0}, "Godrej Agrovet": {"Professional Fees": 137835.56}, "Human Resource": {"Salary - Basic": 600530.0, "Salary - House rent allowance": 240218.0, "Salary - Special allowance": 110713.0, "Salary- Leave Travel Allowances": 148216.0, "Salary- Performance Bonus Paid": 14664.0, "Traveling expenses- Domestic - Staff": 193698.7, "Business promotion- Exhibition & Events": 1383.0, "Sales Meeting Expenses": 65190.0, "PF PAID": -339601.0, "Office rent": 105000.0, "Professional Fees": 760000.0, "Insurance charge-Others": 4589988.78, "Printing and Stationery Expenses": 649.0, "Membership and Subscription": 12000.0, "Staff Welfare": 238308.0, "Labour and Contractor Charges": 1924885.0, "PF - Admin Charges": -13914.0, "Staff Training Expenses": 45500.0, "Software Expenses": 45500.0, "Sodexo Meal Vouchers": 22837.5, "Salary - Gift": 2000.0}, "IT": {"Salary - Basic": 7671.0, "Salary - House rent allowance": 3069.0, "Salary- Leave Travel Allowances": 3313.0, "Traveling expenses- Domestic - Staff": 838.0, "Telephone & Mobile expense": 163616.23, "Internet expense": 87043.0, "AMCs": 34000.0, "Repair and Maintainence- Others": 1300.0, "Printing and Stationery Expenses": 2500.0, "Miscellaneous Office Supplies": 1003.0, "Factory Misc Expenses": 5829.69, "Labour and Contractor Charges": 122760.0, "Repairs and Maintainence - Computers": 23125.0, "Software Expenses": 448769.74, "IT Related Expenese": 6566.0, "Transport - Other": 301.0}, "Jejuri": {"Purchase of Trading Material": 25863957.0, "Purchase of Consumable Material": 590.0, "Electrical Charges": 937190.0, "Traveling expenses- Domestic - Staff": 3305.0, "STAMP Paper and Notary": 1000.0, "AMCs": 90650.0, "Repair and Maintainence- Plant and Machinery": 4450.0, "Repair and Maintainence- Building": 19000.0, "Repair and Maintainence- Others": 660.0, "Printing and Stationery Expenses": 150.0, "Membership and Subscription": 10000.0, "Housekeeping Expenses": 14278.0, "Staff Welfare": 2470.0, "Price Diffence between GRN/INV": 5501559.53, "Freight Inward": 4425.0, "Factory Misc Expenses": 92657.8, "Snacks and Lunch": 3000.0, "Factory Consumables": 57632.0, "Transport - Other": 807.0, "Gardening Expenses": 3600.0}, "Khor-C": {"Loading charges and Unloading charges": 1590.64, "Transporation Charges  - Carriage Outward": 795.32, "Repair and Maintainence- Building": 126282.0, "Repair and Maintainence- Others": 180620.0, "Miscellaneous Office Supplies": 234500.0, "Office General expense": 60098.34, "Factory Misc Expenses": 247367.13}, "Khor - Rented Farm": {"Purchase - Labour": 1800.0, "Product Development Costs": 2032.0, "Factory Misc Expenses": 74461.23}, "Khor": {"transport": 110959.0, "Purchase of Trading Material": 964909.76, "Purchase of Consumable Material": 7642.9, "Purchase - Labour": 9950.0, "Electrical Charges": 10090.0, "Product Development Costs": 47474.25, "Traveling expenses- Domestic - Staff": 11408.0, "Lodging and Boarding-Staff": 2520.0, "Loading charges and Unloading charges": 7500.0, "Business promotion- Exhibition & Events": 573.0, "Other Rates & Taxes": 9247.0, "Telephone & Mobile expense": 30000.0, "Repair and Maintainence- Others": 197083.6, "Printing and Stationery Expenses": 4301.0, "Miscellaneous Office Supplies": 3280.0, "Office General expense": 41200.0, "Housekeeping Expenses": 2030.0, "Staff Welfare": 7124.0, "Freight Inward": 3160.0, "Factory Misc Expenses": 256969.5, "Labour and Contractor Charges": 25500.0, "Petrol expenses": 11970.0, "Repair and Maintainence - Vehicle": 1960.0, "Software Expenses": 135936.0, "Snacks and Lunch": 30949.0, "Factory Consumables": 662731.9, "Variance Account (Production)": 7375.0, "Lodging and Boarding - Guest": 4935.0, "Transport - Other": 10302.0, "Pantry Expenses": 8475.0, "Gardening Expenses": 650.0}, "Kwality": {"Discount allowed": 59520.0}, "Lab": {"transport": 3540.0, "Purchase of Trading Material": 878.8, "Purchase of Consumable Material": 356680.33, "Testing Charges": 36960.0, "Salary - Basic": 638898.0, "Salary - House rent allowance": 255565.0, "Salary - Special allowance": 108160.0, "Salary - Leave Encashment paid": 3198.0, "Salary- Leave Travel Allowances": 167312.0, "Salary- Awards": 1000.0, "Salary- Performance Bonus Paid": 66600.0, "Salary- Stipend": 56500.0, "Traveling expenses- Domestic - Staff": 29293.7, "Lodging and Boarding-Staff": 2520.0, "Toll naka charges": 655.0, "STAMP Paper and Notary": 500.0, "AMCs": 14845.0, "Repair and Maintainence- Others": 2832.0, "Printing and Stationery Expenses": 790.6, "Miscellaneous Office Supplies": 22500.0, "Auditor Expense/ Reimbursement": 6448.7, "Staff Welfare": 3010.0, "Courier Expense": 380.0, "Factory Misc Expenses": 40595.0, "Repairs and Maintainence - Computers": 2985.4, "Quality Audit Expenses": 18500.0, "Snacks and Lunch": 11253.0, "Factory Consumables": 43689.2, "Salary - Gift": 1500.0, "Transport - Other": 5626.0}, "Legal": {"Legal Expenses": 10000.0}, "Logistic": {"Salary - Basic": 335440.0, "Salary - House rent allowance": 134180.0, "Salary - Special allowance": 61430.0, "Salary- Leave Travel Allowances": 81670.0, "Lodging and Boarding-Staff": 1500.0, "Toll naka charges": 22163.0, "Loading charges and Unloading charges": 27790.0, "Transporation Charges  - Carriage Outward": 3114381.0, "Bank Charges Paid": 2.36, "Insurance charge-Others": -1303.0, "Repair and Maintainence- Others": 175.0, "Freight Inward": -13894.0, "Factory Misc Expenses": 2360.0, "Labour and Contractor Charges": 260783.0, "Petrol expenses": 459118.99, "Repair and Maintainence - Vehicle": 71408.0, "Snacks and Lunch": 11721.0, "Factory Consumables": 12460.8, "Salary - Gift": 500.0, "Transport - Other": 420.0}, "Lucid Impex": {"Business promotion- Exhibition & Events": 90000.0}, "Maintenance": {"Transporation Charges  - Carriage Outward": 47200.0, "Repair and Maintainence- Plant and Machinery": 10974.0, "Repair and Maintainence- Building": 71700.0, "Repair and Maintainence- Others": 12865.0, "Factory Misc Expenses": 37696.0, "Repairs and Maintainence - Computers": 2950.0}, "Marketing": {"Purchase of Trading Material": 2297732.08, "Purchase of Consumable Material": 20894.6, "Testing Charges": 60000.0, "Travelling": 26114.0, "Salary - Basic": 2566910.0, "Salary - House rent allowance": 1027477.0, "Salary - Special allowance": 499426.0, "Salary- Leave Travel Allowances": 691679.0, "Salary- Awards": 5000.0, "Salary- Performance Bonus Paid": 397216.0, "Traveling expenses- Domestic - director": 17084.0, "Traveling expenses- Domestic - Staff": 89036.25, "Lodging and Boarding-Staff": 35121.0, "Advertisement": 186284.0, "Business promotion- Exhibition & Events": 181421.26, "Bank Charges Paid": 240.18, "Professional Fees": 200000.0, "Telephone & Mobile expense": 449.0, "Subscriptions, Books & Periodicals": 3503.05, "Printing and Stationery Expenses": 137638.66, "Miscellaneous Office Supplies": 1890.0, "Membership and Subscription": 10920.0, "Staff Welfare": 71572.96, "Factory Misc Expenses": 33156.07, "Repairs and Maintainence - Computers": 1500.0, "Software Expenses": 18108.14, "Snacks and Lunch": 24662.0, "Forex Charges": 970.0, "Travelling - MMT": 211415.21, "Business Promotion - Others": 7886.56, "Salary - Gift": 2000.0, "IT Related Expenese": 7280.0, "Visa/ Empbassy Charges": 4000.0, "Transport - Other": 798.0}, "MIROCHE INTERNATIONAL DMCC": {"Professional fee - Export": 285467.0}, "Nanda": {"Professional Fees": 108000.0, "Cost Of Goods Sold": 242912.68}, "NPD": {"Purchase of Trading Material": 1471022.32, "Purchase of Consumable Material": 3000.0, "Testing Charges": 359448.0, "Product Development Costs": 2689.0, "Salary - Basic": 1018153.0, "Salary - House rent allowance": 407265.0, "Salary - Special allowance": 166820.0, "Salary- Leave Travel Allowances": 272433.0, "Salary- Performance Bonus Paid": 18250.0, "Traveling expenses- Domestic - Staff": 20156.0, "Toll naka charges": 290.0, "Transporation Charges  - Carriage Outward": 6973.0, "Professional Fees": 257000.0, "Miscellaneous Office Supplies": 217.0, "Staff Welfare": 470.0, "Cost Of Goods Sold": 2758.81, "Price Diffence between GRN/INV": 7110.0, "Snacks and Lunch": 5047.0, "Processing Charges - Mfg": 106200.0, "Factory Consumables": 17890.0, "Salary - Gift": 500.0, "Transport - Other": 449.0}, "Production": {"transport": 19646.4, "Purchase of Packing Materials": 9457382.13, "Purchase of Trading Material": 37180870.03, "Purchase of Consumable Material": 16900.0, "Purchase - Custom Duty": 3327260.0, "Electrical Charges": -70050.0, "Salary - Basic": 1152637.0, "Salary - House rent allowance": 462034.0, "Salary - Special allowance": 223761.0, "Salary- Leave Travel Allowances": 279043.0, "Salary- Performance Bonus Paid": 9308.0, "Traveling expenses- Domestic - Staff": 24150.0, "Loading charges and Unloading charges": 1652.0, "Transport": 590.0, "Transporation Charges  - Carriage Outward": 5835.0, "Bank Charges Paid": 3736.12, "Insurance Charge- Stock": 141416.0, "AMCs": 68486.0, "Repair and Maintainence- Plant and Machinery": 272786.0, "Repair and Maintainence- Others": 6340.0, "Printing and Stationery Expenses": 238928.32, "Housekeeping Expenses": 300.0, "Staff Welfare": 19090.0, "Price Diffence between GRN/INV": 397018.77, "Freight Inward": 3768.0, "Factory Misc Expenses": 179075.47, "Labour and Contractor Charges": 658416.0, "Snacks and Lunch": 2360.0, "Processing Charges - Mfg": 241210.18, "Factory Consumables": 514976.13, "Custom Clearance Expenses": 14759.0, "Salary - Gift": 4000.0, "Overtime Charge": 80066.62}, "Purchase": {"Purchase of Trading Material": 1730585.0, "Purchase of Consumable Material": 236.0, "Purchase - Custom Duty": 760229.0, "Port to WH Transport Expenses": 223064.0, "Testing Charges": 5000.0, "Salary - Basic": 533833.0, "Salary - House rent allowance": 213538.0, "Salary - Special allowance": 92554.0, "Salary- Leave Travel Allowances": 137065.0, "Salary- Performance Bonus Paid": 13242.0, "Traveling expenses- Domestic - Staff": 25207.0, "Loading charges and Unloading charges": 14892.0, "Transporation Charges  - Carriage Outward": 1886.0, "Loading charges and Unloading charges - Plant": 2800.0, "Bank Charges Paid": 1243.76, "STAMP Paper and Notary": 1900.0, "Professional Fees": 214745.26, "Subscriptions, Books & Periodicals": 1800.0, "Printing and Stationery Expenses": 930.0, "Office General expense": 70000.0, "Price Diffence between GRN/INV": 111960.0, "Freight Inward": 1194162.28, "Shipping Line Charges": 236411.3, "Factory Misc Expenses": 3360.0, "RoundOff": 0.24, "Repairs and Maintainence - Computers": 9735.0, "Snacks and Lunch": 14578.0, "Factory Consumables": 1640.0, "Custom Clearance Expenses": 196650.1, "Salary - Gift": 1000.0, "Interest - Others": 34298.04, "Transport - Other": 8225.0}, "Sales Meet": {"Traveling expenses- Domestic - Staff": -215299.0, "Business promotion- Exhibition & Events": 9801.0, "Sales Meeting Expenses": 36023.26, "Staff Welfare": 6172.0}, "Sales": {"Salary - Basic": 5225168.0, "Salary - House rent allowance": 2045126.0, "Salary - Special allowance": 838386.0, "Salary - Leave Encashment paid": 85847.0, "Salary- Leave Travel Allowances": 1390174.0, "Salary- Performance Bonus Paid": 876679.0, "Traveling expenses- Domestic - director": 47565.6, "Traveling expenses- Domestic - Staff": 953031.0, "Traveling expenses- International - director": 369484.73, "Traveling expenses- International - Staff": 134649.35, "Lodging and Boarding-Directors": 111075.74, "Lodging and Boarding-Staff": 240194.54, "Toll naka charges": 18583.0, "Damages": 3635.0, "Business promotion- Exhibition & Events": 80511.05, "Discount allowed": 48502.0, "Transporation Charges  - Carriage Outward": 2460221.45, "Bank Charges Paid": 300.0, "STAMP Paper and Notary": 300.0, "Professional Fees": 1087306.78, "Insurance charge-Transport": 20005.0, "Telephone & Mobile expense": 14468.0, "Printing and Stationery Expenses": 420.0, "Miscellaneous Office Supplies": 160.0, "Office General expense": 105000.0, "Staff Welfare": 5000.0, "Foreign Exchange Losses": 915.08, "Courier Expense": 1970.0, "Cost Of Goods Sold": 182957917.34, "Price Diffence between GRN/INV": -0.01, "RoundOff": 0.21, "Software Expenses": 175383.0, "Snacks and Lunch": 562611.23, "Rate Difference": 623700.0, "Forex Charges": 994.0, "Factory Consumables": 22250.0, "Travelling - MMT": 686279.0, "Business Promotion - Others": 10627.1, "Salary - Gift": 4000.0, "Transport - Other": 341.0}, "Sales - Feedmate": {"Traveling expenses- Domestic - Staff": 17990.0, "Lodging and Boarding-Staff": 26160.0, "Loading charges and Unloading charges": 172.0, "Business promotion- Exhibition & Events": 24352.0, "Staff Welfare": 4496.0, "Snacks and Lunch": 3400.0}, "Shanthi": {"Professional Fees": 83331.0, "Rate Difference": 50000.0, "Snacks and Lunch - Others": 927679.0}, "SKM": {"Loading charges and Unloading charges - Plant": 930280.0, "Professional Fees": 123356.82, "Bredol Applicator Expenses": 50386.0, "Office General Exp - Others": 932580.0}, "Sneha": {"Bredol Applicator Expenses": 4720.0}, "SRS Japanese": {"Business promotion- Exhibition & Events": 20000.0}, "Store": {"Salary - Basic": 174191.0, "Salary - House rent allowance": 69678.0, "Salary - Special allowance": 30212.0, "Salary - Leave Encashment paid": 2978.0, "Salary- Leave Travel Allowances": 44642.0, "Repair and Maintainence- Others": 250.0, "Printing and Stationery Expenses": 3315.6, "Factory Misc Expenses": 945.0, "Factory Consumables": 22250.0, "Salary - Gift": 500.0}, "Marketing West": {"Business promotion- Exhibition & Events": 2676.0}}};</script>
 <script>
-const fmtINR = n => {
-  const neg=n<0; n=Math.abs(n); let s;
+/* ================= helpers ================= */
+const fmtINR=n=>{const neg=n<0;n=Math.abs(n);let s;
   if(n>=1e7)s='₹'+(n/1e7).toFixed(2)+' Cr';
   else if(n>=1e5)s='₹'+(n/1e5).toFixed(2)+' L';
   else s='₹'+Math.round(n).toLocaleString('en-IN');
-  return (neg?'−':'')+s;
-};
-const fmtFull = n => (n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN',{maximumFractionDigits:0});
+  return (neg?'−':'')+s;};
+const fmtFull=n=>(n<0?'−':'')+'₹'+Math.abs(n).toLocaleString('en-IN',{maximumFractionDigits:0});
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-const PALETTE=['#38bdf8','#a78bfa','#f472b6','#fb923c','#34d399','#facc15','#60a5fa','#f87171','#4ade80','#c084fc','#2dd4bf','#fbbf24','#94a3b8'];
-
-/* ---------- state ---------- */
-let grouped=true, selDept='';
+const PALETTE=['#2563eb','#7c3aed','#db2777','#ea580c','#059669','#ca8a04','#0284c7','#dc2626','#16a34a','#9333ea','#0891b2','#d97706'];
 const T=DATA.totals;
 
-/* ---------- KPI cards ---------- */
-document.getElementById('kpis').innerHTML=[
-  ['Turnover till date', fmtINR(T.turnover),'var(--good)','Sales amount booked Apr–Jul'],
-  ['Net of Expenses', fmtINR(T.expenses),'var(--bad)','after credits & reversals'],
-  ['Net Profit', fmtINR(T.profit),'var(--accent)',`Turnover − Expenses · margin ${T.margin}%`],
-  T.hasBudget
-    ?['Budget utilisation',(T.expenses/(T.budgetTotal||1)*100).toFixed(1)+'%','var(--warn)','of total department budgets']
-    :['Budget','Awaiting data','var(--warn)','department-wise budget not yet shared']
-].map(([l,v,c,h])=>`<div class="kpi" style="--kc:${c}"><div class="lbl">${l}</div><div class="val">${v}</div><div class="hint">${h}</div></div>`).join('');
-if(!T.hasBudget) document.getElementById('budgetNote').textContent=' Budget columns will activate once the department-wise budget sheet is shared.';
+function countUp(el,target,fmt){
+  const t0=performance.now(),dur=900,from=0;
+  function step(t){const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+    el.textContent=fmt(from+(target-from)*e);
+    if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+window.jump=id=>document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
 
-/* ---------- charts ---------- */
-Chart.defaults.color='#94a3b8';
-Chart.defaults.borderColor='#334155';
-Chart.defaults.font.family="-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
-
-const chPL=new Chart(document.getElementById('chPL'),{
-  type:'bar',
-  data:{labels:[],datasets:[
-    {label:'Turnover',data:[],backgroundColor:'#34d399',borderRadius:4},
-    {label:'Expenses',data:[],backgroundColor:'#f87171',borderRadius:4},
-    {label:'Net Profit',data:[],backgroundColor:'#38bdf8',borderRadius:4},
-  ]},
-  options:{
-    indexAxis:'y',maintainAspectRatio:false,
-    onClick:(e,els)=>{if(els.length)setDept(chPL.data.labels[els[0].index]);},
-    plugins:{legend:{labels:{boxWidth:12}},tooltip:{
-      callbacks:{label:c=>' '+c.dataset.label+': '+fmtFull(c.raw)}}},
-    scales:{x:{ticks:{callback:v=>fmtINR(v)}},y:{ticks:{autoSkip:false,font:{size:11}}}}
-  }
-});
-
-const chMix=new Chart(document.getElementById('chMix'),{
-  type:'doughnut',
-  data:{labels:[],datasets:[{data:[],backgroundColor:PALETTE,borderWidth:0}]},
-  options:{maintainAspectRatio:false,cutout:'58%',
-    plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}},
-      tooltip:{callbacks:{label:c=>' '+c.label+': '+fmtFull(c.raw)+' ('+(c.raw/T.expenses*100).toFixed(1)+'%)'}}}}
-});
+/* ================= state ================= */
+let grouped=true, selDept='', selHead='';
+const $=id=>document.getElementById(id);
 
 function view(){return grouped
   ?{depts:DATA.deptsGrouped,matrix:DATA.matrixGrouped,heads:DATA.headsGrouped}
   :{depts:DATA.deptsRaw,matrix:DATA.matrixRaw,heads:DATA.headsRaw};}
 
-function renderCharts(){
-  const q=document.getElementById('fSearch').value.trim().toLowerCase();
+function scopeData(){
   const V=view();
   const depts=V.depts.filter(d=>!selDept||d.name===selDept)
-    .filter(d=>!q||Object.entries(V.matrix[d.name]||{}).some(([h])=>h.toLowerCase().includes(q)));
-
-  chPL.data.labels=depts.map(d=>d.name);
-  chPL.data.datasets[0].data=depts.map(d=>Math.round(d.sales));
-  chPL.data.datasets[1].data=depts.map(d=>Math.round(d.net));
-  chPL.data.datasets[2].data=depts.map(d=>Math.round(d.sales-d.net));
-  chPL.update();
-
-  const scope={};
+    .filter(d=>!selHead||Object.entries(V.matrix[d.name]||{}).some(([h])=>h.toLowerCase().includes(selHead)));
+  const heads={};
   for(const d of depts)for(const[h,v]of Object.entries(V.matrix[d.name]||{})){
-    if(q&&!h.toLowerCase().includes(q))continue; scope[h]=(scope[h]||0)+v;}
-  const top=Object.entries(scope).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const rest=Object.values(scope).reduce((a,v)=>a+v,0)-top.reduce((a,[,v])=>a+v,0);
-  document.getElementById('mixTitle').textContent=
-    `Expense Heads ${selDept?'— '+selDept:''}${q?' · “'+q+'”':''}`;
-  chMix.data.labels=top.map(([h])=>h.length>32?h.slice(0,31)+'…':h)
-    .concat(rest>1000?['Others']:[]);
-  chMix.data.datasets[0].data=top.map(([,v])=>Math.round(v))
-    .concat(rest>1000?[Math.round(rest)]:[]);
-  chMix.update();
+    if(selHead&&!h.toLowerCase().includes(selHead))continue;
+    heads[h]=(heads[h]||0)+v;}
+  const turnover=V.depts===DATA.deptsGrouped
+    ?depts.reduce((a,d)=>a+d.sales,0):T.turnover;
+  const exp=depts.reduce((a,d)=>a+d.net,0);
+  return {V,depts,heads,turnover,exp,profit:turnover-exp};
 }
 
-/* ---------- drill-down ---------- */
-function renderDrill(){
-  const el=document.getElementById('drillBody');
-  const tEl=document.getElementById('drillTitle');
-  if(!selDept){
-    tEl.textContent='Departments Overview';
-    el.innerHTML=`<table><thead><tr><th>Department</th><th>Sales</th><th>Net Expenses</th><th>Profit</th></tr></thead><tbody>`+
-      view().depts.slice(0,40).map(d=>{
-        const p=d.sales-d.net;
-        return `<tr style="cursor:pointer" onclick="setDept('${esc(d.name).replace(/'/g,"\'")}')">
-        <td>${esc(d.name)}</td><td>${fmtFull(d.sales)}</td>
-        <td>${fmtFull(d.net)}</td>
-        <td class="${p<0?'neg':'pos'}"><b>${fmtFull(p)}</b></td></tr>`}).join('')+
-      `<tr class="total"><td>Total</td><td>${fmtFull(T.turnover)}</td><td>${fmtFull(T.expenses)}</td><td>${fmtFull(T.profit)}</td></tr></tbody></table>`;
-    return;
+/* ================= KPI cards + story ================= */
+function renderKPI(){
+  const S=scopeData();
+  countUp($('kIn'),S.turnover,fmtINR);
+  countUp($('kOut'),S.exp,fmtINR);
+  countUp($('kNet'),S.profit,fmtINR);
+  const earn=S.turnover||1;
+  $('kInSub').textContent= selDept? 'in '+selDept : 'across all departments';
+  $('kOutSub').innerHTML='<b>'+(S.exp/earn*100).toFixed(1)+'</b>';
+  $('kNetSub').textContent=(S.profit/earn*100).toFixed(1)+'%';
+  const max=Math.max(S.turnover,S.exp,Math.abs(S.profit))||1;
+  requestAnimationFrame(()=>{$('bIn').style.width=(S.turnover/max*100)+'%';
+    $('bOut').style.width=(S.exp/max*100)+'%';
+    $('bNet').style.width=(Math.abs(S.profit)/max*100)+'%';});
+
+  /* story sentence */
+  let st;
+  if(!selDept&&!selHead){
+    st=`Between <b>April–July</b>, the business earned <b>${fmtINR(T.turnover)}</b> from sales and spent <b>${fmtINR(T.expenses)}</b> running it — that's about <b>₹${(T.expenses/T.turnover*100).toFixed(0)}</b> spent for every <b>₹100</b> earned — keeping a profit of <b>${fmtINR(T.profit)}</b>.`;
+  }else if(selDept){
+    const d=S.V.depts.find(x=>x.name===selDept);
+    st=`Looking at <b>${esc(selDept)}</b>: sales <b>${fmtINR(d.sales)}</b>, expenses <b>${fmtINR(d.net)}</b>, result ${d.sales-d.net>=0?'profit':'loss'} of <b>${fmtINR(d.sales-d.net)}</b>.`;
+  }else{
+    st=`Filtered by heads matching <b>“${esc(selHead)}”</b>: total spend on them is <b>${fmtINR(Object.values(S.heads).reduce((a,v)=>a+v,0))}</b>.`;
   }
-  const d=view().depts.find(x=>x.name===selDept)||{net:0,sales:0};
-  const m=view().matrix[selDept]||{};
-  const rows=Object.entries(m).sort((a,b)=>b[1]-a[1]);
-  tEl.innerHTML=`Drill-down: <span class="badge">${esc(selDept)}</span>`;
-  el.innerHTML=`<table><thead><tr><th>Expense Head</th><th>Net</th><th>% of Dept</th></tr></thead><tbody>`+
-    rows.map(([h,v],i)=>`<tr><td style="white-space:normal"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${PALETTE[i%PALETTE.length]};margin-right:6px"></span>${esc(h)}</td>
-      <td class="${v<0?'neg':'pos'}">${fmtFull(v)}</td>
-      <td>${(Math.abs(v)/Math.max(Math.abs(d.net),1)*100).toFixed(1)}%</td></tr>`).join('')+
-    `<tr class="total"><td>Total (${rows.length})</td><td>${fmtFull(d.net)}</td><td></td></tr></tbody></table>`;
+  $('storyText').innerHTML=st;
+
+  $('tkFlow').textContent=!selDept&&!selHead
+    ?'Everything earned minus everything spent — the whole story in one picture.'
+    :(selDept?`The bridge for ${selDept} only.`:`Showing only heads matching “${selHead}”.`);
 }
 
-/* ---------- pivot ---------- */
-function renderPivot(){
-  const q=document.getElementById('fSearch').value.trim().toLowerCase();
+/* ================= waterfall ================= */
+const connector={id:'connector',afterDatasetsDraw(ch){
+  const meta=ch.getDatasetMeta(0);if(meta.data.length<3)return;
+  const ctx=ch.ctx;ctx.save();ctx.strokeStyle='#94a3b8';ctx.setLineDash([4,4]);ctx.lineWidth=1;
+  for(let i=0;i<meta.data.length-1;i++){
+    const a=meta.data[i],b=meta.data[i+1];
+    const ya=a.y,b_y=b.y;
+    ctx.beginPath();ctx.moveTo(a.x+a.width/2,ya);ctx.lineTo(b.x-b.width/2,b_y);ctx.stroke();}
+  ctx.restore();}};
+Chart.defaults.font.family="-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+Chart.defaults.color='#64748b';
+
+let chFlow,chHeads;
+function buildCharts(){
+  chFlow=new Chart($('chFlow'),{type:'bar',
+    data:{labels:['Earned','Spent','Kept'],datasets:[{data:[],borderRadius:10,borderSkipped:false,barPercentage:.55}]},
+    options:{maintainAspectRatio:false,
+      onClick:(e,els)=>{if(els.length&&els[0].index===1)jump('secHeads');if(els.length&&els[0].index===0)jump('secDepts');},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>{
+          const v=c.raw[1]-c.raw[0];
+          return ' '+c.label+': '+fmtFull(v)+(c.label==='Kept'?` (${(v/(scopeData().turnover||1)*100).toFixed(1)}% margin)`:'');}}}},
+      scales:{y:{ticks:{callback:v=>fmtINR(v)},grid:{color:'#eef1f7'}},x:{grid:{display:false}}}},
+    plugins:[connector]});
+
+  chHeads=new Chart($('chHeads'),{type:'bar',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:7,barPercentage:.72}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,
+      onClick:(e,els)=>{if(els.length)setHead(chHeads.data.labels[els[0].index]);},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>' '+c.dataset.labelAt?.[c.dataIndex]+': '+fmtFull(c.raw)+
+          ' ('+(c.raw/(scopeData().exp||1)*100).toFixed(1)+'% of spend)'}}},
+      scales:{x:{ticks:{callback:v=>fmtINR(v)},grid:{color:'#eef1f7'}},y:{grid:{display:false},ticks:{font:{size:11.5}}}}}});
+}
+
+function renderCharts(){
+  const S=scopeData();
+  /* waterfall */
+  chFlow.data.datasets[0].data=[
+    [0,Math.round(S.turnover)],
+    [Math.round(Math.min(S.turnover,S.profit)),Math.round(S.turnover)],
+    [0,Math.round(S.profit)]];
+  chFlow.data.datasets[0].backgroundColor=['#059669','#e11d48',S.profit>=0?'#2563eb':'#d97706'];
+  chFlow.update();
+
+  /* head bars top 8 */
+  const top=Object.entries(S.heads).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const rest=Object.values(S.heads).reduce((a,v)=>a+v,0)-top.reduce((a,[,v])=>a+v,0);
+  const rows=top.map(([h,v])=>({h:h.length>38?h.slice(0,37)+'…':h,hFull:h,v}));
+  if(rest>1000)rows.push({h:'Everything else',hFull:'All other heads combined',v:rest});
+  chHeads.data.labels=rows.map(r=>r.h);
+  chHeads.data.datasets[0].labelAt=rows.map(r=>r.hFull);
+  chHeads.data.datasets[0].data=rows.map(r=>Math.round(r.v));
+  chHeads.data.datasets[0].backgroundColor=rows.map((r,i)=>
+    r.h==='Everything else'?'#cbd5e1':PALETTE[i%PALETTE.length]);
+  chHeads.update();
+
+  /* dept tiles */
+  const maxExp=Math.max(...S.depts.map(d=>Math.abs(d.net)),1);
+  const sorted=[...S.depts].sort((a,b)=>b.net-a.net);
+  $('deptTiles').innerHTML=sorted.map(d=>{
+    const p=d.sales-d.net;
+    return `<div class="tile ${selDept===d.name?'sel':''}" onclick="setDept('${esc(d.name).replace(/'/g,"\'")}')"
+      title="${esc(d.name)}: expenses ${fmtFull(d.net)}, sales ${fmtFull(d.sales)}">
+      <div class="nm"><span>${esc(d.name)}</span><span>${(Math.abs(d.net)/(S.exp||1)*100).toFixed(1)}%</span></div>
+      <div class="amt">${fmtINR(d.net)}</div>
+      <div class="track"><i style="width:${(Math.abs(d.net)/maxExp*100).toFixed(1)}%"></i></div>
+      <div class="pf">${p>=0?'▲':'▼'} profit ${fmtINR(p)}${d.budget!=null?' · budget '+fmtINR(d.budget):''}</div>
+    </div>`;}).join('');
+
+  $('tkDepts').textContent=S.depts.length===1
+    ?`Only ${sorted[0].name} is selected — clear the filter to see all.`
+    :`${sorted.length} groups together account for all spending.`;
+}
+
+/* ================= chips ================= */
+function renderChips(){
+  const c=$('chips');let html='';
+  if(selDept)html+=`<span class="chip-f">🏢 <b>${esc(selDept)}</b><button onclick="setDept('${esc(selDept).replace(/'/g,"\'")}')" aria-label="remove">✕</button></span>`;
+  if(selHead)html+=`<span class="chip-f">🔎 heads like <b>“${esc(selHead)}”</b><button onclick="setHead('')" aria-label="remove">✕</button></span>`;
+  if(!grouped)html+=`<span class="chip-f">📋 Detailed SAP view<button onclick="setView(true)" aria-label="remove">✕</button></span>`;
+  if(html){c.style.display='flex';c.innerHTML=html+'<button class="clear" onclick="clearAll()">Clear everything</button>';}
+  else c.style.display='none';
+  $('fInfo').textContent='';
+}
+
+/* ================= table ================= */
+let sortCol=null,sortAsc=false;
+function renderTable(){
+  const q=selHead;
   const V=view();
   const headTotals={},deptRows=[];
   for(const d of V.depts){
@@ -292,91 +425,88 @@ function renderPivot(){
       cells[h]=v;tot+=v;headTotals[h]=(headTotals[h]||0)+v;}
     if(Object.keys(cells).length)deptRows.push({name:d.name,cells,total:tot});
   }
-  let topHeads=Object.entries(headTotals).sort((a,b)=>b[1]-a[1]);
-  topHeads=topHeads.slice(0,25);
-  deptRows.sort((a,b)=>b.total-a.total);
+  let topHeads=Object.entries(headTotals).sort((a,b)=>b[1]-a[1]).slice(0,25);
+  if(sortCol!==null){
+    if(sortCol==='total')deptRows.sort((a,b)=>sortAsc?a.total-b.total:b.total-a.total);
+    else if(sortCol==='name')deptRows.sort((a,b)=>sortAsc?a.name.localeCompare(b.name):b.name.localeCompare(a.name));
+    else{const h=topHeads[sortCol]?.[0];if(h)deptRows.sort((a,b)=>sortAsc?(a.cells[h]||0)-(b.cells[h]||0):(b.cells[h]||0)-(a.cells[h]||0));}
+  }else deptRows.sort((a,b)=>b.total-a.total);
 
   const maxAbs=Math.max(...topHeads.map(([,v])=>Math.abs(v)),1);
   const heat=v=>{const t=Math.min(Math.abs(v)/maxAbs,1);
-    return v>=0?`rgba(56,189,248,${(t*.55+.05).toFixed(2)})`:`rgba(248,113,113,${(t*.55+.05).toFixed(2)})`;};
-  const short=s=>s.length>22?s.slice(0,21)+'…':s;
+    return v>=0?`rgba(37,99,235,${(t*.35+.04).toFixed(2)})`:`rgba(225,29,72,${(t*.35+.04).toFixed(2)})`;};
+  const short=s=>s.length>24?s.slice(0,23)+'…':s;
 
-  let html=`<thead><tr><th>Department ▾</th>${topHeads.map(([,v],i)=>`<th title="${esc(topHeads[i][0])}">${short(esc(topHeads[i][0]))}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  let html=`<thead><tr><th data-sort="name">Department ⇅</th>`+
+    topHeads.map(([,v],i)=>`<th data-sort="${i}" title="${esc(topHeads[i][0])}">${short(esc(topHeads[i][0]))} ⇅</th>`).join('')+
+    `<th data-sort="total">Total ⇅</th></tr></thead><tbody>`;
   for(const dr of deptRows){
-    html+=`<tr onclick="setDept('${esc(dr.name).replace(/'/g,"\'")}')" style="cursor:pointer"><td><b>${esc(dr.name)}</b></td>`+
+    html+=`<tr class="rowclick" onclick="setDept('${esc(dr.name).replace(/'/g,"\'")}')"><td><b>${esc(dr.name)}</b></td>`+
       topHeads.map(([h])=>{const v=dr.cells[h];return v===undefined?'<td class="dim">·</td>':
-        `<td style="background:${heat(v)}" class="${v<0?'neg':''}" title="${esc(h)}">${fmtFull(v)}</td>`}).join('')+
+        `<td style="background:${heat(v)}" class="${v<0?'':''}" title="${esc(h)}: ${fmtFull(v)}">${fmtFull(v)}</td>`}).join('')+
       `<td><b>${fmtFull(dr.total)}</b></td></tr>`;
   }
   html+=`<tr class="total"><td>Total</td>${topHeads.map(([,v])=>`<td>${fmtFull(v)}</td>`).join('')}<td>${fmtFull(deptRows.reduce((a,d)=>a+d.total,0))}</td></tr></tbody>`;
-  document.getElementById('pivot').innerHTML=html;
-
-  document.getElementById('fInfo').textContent=
-    `${deptRows.length} departments · ${topHeads.length} heads ${q?`matching “${q}”`:''}${selDept?' · '+selDept:''}`;
+  $('pivot').innerHTML=html;
+  $('pivot').querySelectorAll('th[data-sort]').forEach(th=>{
+    th.onclick=()=>{const k=th.dataset.sort;
+      if(sortCol===k)sortAsc=!sortAsc;else{sortCol=k;sortAsc=false;}
+      renderTable();};});
+  const n=topHeads.length;
+  $('fInfo').textContent=`${deptRows.length} departments × ${n} heads shown`;
 }
 
-/* ---------- wiring ---------- */
+/* ================= actions ================= */
 window.setDept=function(name){
-  selDept=(selDept===name)?'':name;
-  document.getElementById('fDept').value=selDept;
-  renderCharts();renderDrill();renderPivot();};
-function fillDeptFilter(){
-  document.getElementById('fDept').innerHTML='<option value="">All departments</option>'+
-    view().depts.map(d=>`<option>${esc(d.name)}</option>`).join('');}
-document.getElementById('fDept').onchange=e=>{selDept=e.target.value;renderCharts();renderDrill();renderPivot();};
-document.getElementById('fSearch').oninput=()=>{renderCharts();renderPivot();};
-document.getElementById('fReset').onclick=()=>{
-  selDept='';document.getElementById('fDept').value='';
-  document.getElementById('fSearch').value='';
-  renderCharts();renderDrill();renderPivot();};
-document.getElementById('vGrouped').onclick=()=>{
-  grouped=true;selDept='';
-  document.getElementById('vGrouped').classList.add('on');
-  document.getElementById('vRaw').classList.remove('on');
-  fillDeptFilter();renderCharts();renderDrill();renderPivot();};
-document.getElementById('vRaw').onclick=()=>{
-  grouped=false;selDept='';
-  document.getElementById('vRaw').classList.add('on');
-  document.getElementById('vGrouped').classList.remove('on');
-  fillDeptFilter();renderCharts();renderDrill();renderPivot();};
+  selDept=(selDept===name)?'':name;$('fDept').value=selDept;
+  refresh();};
+window.setHead=function(q){selHead=q;$('fSearch').value=q;refresh();};
+window.setView=function(g){grouped=g;selDept='';
+  $('vGrouped').classList.toggle('on',g);$('vRaw').classList.toggle('on',!g);
+  fillDeptFilter();refresh();};
+window.clearAll=function(){selDept='';selHead='';$('fDept').value='';$('fSearch').value='';refresh();};
+function refresh(){renderKPI();renderCharts();renderChips();renderTable();}
+function fillDeptFilter(){$('fDept').innerHTML='<option value="">All departments</option>'+
+  view().depts.map(d=>`<option>${esc(d.name)}</option>`).join('');}
 
-fillDeptFilter();renderCharts();renderDrill();renderPivot();
+$('fDept').onchange=e=>setDept(e.target.value);
+$('fSearch').oninput=e=>setHead(e.target.value.trim().toLowerCase());
+$('fReset').onclick=clearAll;
+$('vGrouped').onclick=()=>setView(true);
+$('vRaw').onclick=()=>setView(false);
 
-/* ---------- merge map modal ---------- */
+/* ================= merge map ================= */
 let mapTab='depts';
 function renderMap(){
-  const q=document.getElementById('mapSearch').value.trim().toLowerCase();
-  const M=DATA.mergeInfo;
-  let html='';
+  const q=$('mapSearch').value.trim().toLowerCase();
+  const M=DATA.mergeInfo;let html='';
   if(mapTab==='depts'){
-    document.getElementById('mtDepts').textContent=`Departments (${M.depts.length} merged)`;
     for(const row of M.depts){
-      if(q && !row.into.toLowerCase().includes(q) && !row.parts.some(p=>p.toLowerCase().includes(q)))continue;
+      if(q&&!row.into.toLowerCase().includes(q)&&!row.parts.some(p=>p.toLowerCase().includes(q)))continue;
       html+=`<div class="merge-row"><div class="into">📦 ${esc(row.into)}</div>`+
         row.parts.map(p=>`<span class="chip">${esc(p)}</span>`).join('')+
-        `<span class="chip" style="color:var(--muted)">${row.parts.length} department${row.parts.length>1?'s':''}</span></div>`;
-    }
+        `<span class="chip mut">${row.parts.length} in one</span></div>`;}
   }else{
-    document.getElementById('mtHeads').textContent=`Expense heads (${M.heads.length} groups)`;
     for(const row of M.heads){
-      if(q && !row.group.toLowerCase().includes(q) && !row.accounts.some(a=>a.toLowerCase().includes(q)))continue;
+      if(q&&!row.group.toLowerCase().includes(q)&&!row.accounts.some(a=>a.toLowerCase().includes(q)))continue;
       html+=`<div class="merge-row"><div class="into">🧾 ${esc(row.group)}</div>`+
-        row.accounts.map(a=>`<span class="chip">${esc(a.length>46?a.slice(0,45)+'…':a)}</span>`).join('')+
-        `<span class="chip" style="color:var(--muted)">${row.accounts.length} account${row.accounts.length>1?'s':''}</span></div>`;
-    }
+        row.accounts.map(a=>`<span class="chip">${esc(a.length>48?a.slice(0,47)+'…':a)}</span>`).join('')+
+        `<span class="chip mut">${row.accounts.length} accounts</span></div>`;}
   }
-  document.getElementById('mapBody').innerHTML=html||'<div style="padding:20px;color:var(--muted)">No match</div>';
+  $('mapBody').innerHTML=html||'<div style="padding:24px" class="mut">Nothing matches your search.</div>';
 }
-document.getElementById('btnMap').onclick=()=>{
-  document.getElementById('mapOverlay').style.display='flex';renderMap();};
-document.getElementById('mapClose').onclick=()=>document.getElementById('mapOverlay').style.display='none';
-document.getElementById('mapOverlay').onclick=e=>{if(e.target.id==='mapOverlay')e.target.style.display='none';};
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('mapOverlay').style.display='none';});
-document.getElementById('mapSearch').oninput=renderMap;
-document.getElementById('mtDepts').onclick=()=>{mapTab='depts';
-  document.getElementById('mtDepts').classList.add('on');document.getElementById('mtHeads').classList.remove('on');renderMap();};
-document.getElementById('mtHeads').onclick=()=>{mapTab='heads';
-  document.getElementById('mtHeads').classList.add('on');document.getElementById('mtDepts').classList.remove('on');renderMap();};
+$('btnMap').onclick=()=>{$('mapOverlay').style.display='flex';renderMap();};
+$('mapClose').onclick=()=>$('mapOverlay').style.display='none';
+$('mapOverlay').onclick=e=>{if(e.target.id==='mapOverlay')e.target.style.display='none';};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('mapOverlay').style.display='none';});
+$('mapSearch').oninput=renderMap;
+$('mtDepts').onclick=()=>{mapTab='depts';$('mtDepts').classList.add('on');$('mtHeads').classList.remove('on');renderMap();};
+$('mtHeads').onclick=()=>{mapTab='heads';$('mtHeads').classList.add('on');$('mtDepts').classList.remove('on');renderMap();};
+
+/* ================= boot ================= */
+buildCharts();
+fillDeptFilter();
+refresh();
 </script>
 </body>
 </html>
